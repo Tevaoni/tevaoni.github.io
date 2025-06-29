@@ -63,6 +63,8 @@
         // pour le programme tout
         const volume6Terrains = volumeTotal * 6;
         const temps6Terrains = temps * 5.66;
+        const heures6T = Math.floor(temps6Terrains / 60);
+        const minutes6T = Math.round(temps6Terrains % 60);
 
 
         const ligne = `
@@ -73,8 +75,7 @@
             <td>${besoin.toFixed(1)}</td>
             <td>×${cycles} (9×${cycles} = ${volumeTotal} m³)</td>
             <td>${Math.floor(temps/60)}h ${temps%60}min</td>
-
-            <td>${volume6Terrains.toFixed(1)}m³ & ${Math.floor(temps6Terrains / 60)}h ${temps6Terrains % 60}min</td>
+            <td>${volume6Terrains.toFixed(1)}m³ & ${heures6T}h ${minutes6T}min</td>
           </tr>
         `;
         table.insertAdjacentHTML("beforeend", ligne);

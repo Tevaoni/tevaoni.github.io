@@ -33,14 +33,20 @@
     const dureeParCycle = 25;
 
     async function afficherProgramme() {
-      const url = "https://api.open-meteo.com/v1/forecast?latitude=49.8942&longitude=2.2633&daily=temperature_2m_max,temperature_2m_min,evapotranspiration&timezone=Europe%2FParis&altitude=22";
+      const url = "https://api.open-meteo.com/v1/forecast?latitude=49.8942&longitude=2.2633&daily=temperature_2m_max,temperature_2m_min,et0_fao_evapotranspiration&timezone=Europe%2FParis&altitude=22";
       const res = await fetch(url);
       const data = await res.json();
+      
+    // ✅ Vérifie que les données sont bien structurées avant d’avancer
+    if (!data.daily || !data.daily.time) {
+      console.error("Erreur dans la réponse API :", data);
+      return;
+    }
 
       const jours = data.daily.time;
       const tMax = data.daily.temperature_2m_max;
       const tMin = data.daily.temperature_2m_min;
-      const etp = data.daily.evapotranspiration;
+      const etp = data.daily.et0_fao_evapotranspiration;
 
       const table = document.getElementById("tableau");
 

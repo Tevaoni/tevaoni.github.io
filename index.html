@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Arrosage automatique – Amiens</title>
+  <title>Arrosage – Amiens</title>
   <style>
     body { font-family: sans-serif; padding: 2em; max-width: 900px; margin: auto; background: #f9f9f9; }
     h1 { color: #2a7; }
@@ -13,18 +13,18 @@
   </style>
 </head>
 <body>
-  <h1>💧 Programme d’arrosage automatique – Stade La Licorne, Amiens</h1>
-  <p>Données météo en direct via <strong>Open-Meteo</strong> pour un terrain de 7 500 m². Mise à jour quotidienne automatique.</p>
+  <h1>💧 Programme d’arrosage automatique</h1>
+  <p>Données météo en direct via <strong>Open-Meteo</strong></p>
 
   <table id="tableau">
     <tr>
       <th>📅 Date</th>
-      <th>🌡️ T° Max / Min</th>
+      <th>🌡️ T° Min / Max</th>
       <th>🌧️ Pluie (mm)</th>
-      <th>🔆 ETP réelle (mm)</th>
+      <th>🔆 ETP (mm)</th>
       <th>💧 Besoin estimé (m³)</th>
-      <th>🔁 Programme</th>
-      <th>⏱️ Temps</th>
+      <th>🔁 bonus x%</th>
+      <th>⏱️&💧terrain A</th>
       <th>⏱️&💧tout</th>
     </tr>
   </table>
@@ -74,13 +74,13 @@
         const ligne = `
           <tr>
             <td>${date}</td>
-            <td>${tmax.toFixed(1)}° / ${tmin.toFixed(1)}°</td>
+            <td>${tmin.toFixed(1)}° / ${tmax.toFixed(1)}°</td>
             <td>${pluieJour.toFixed(1)}</td>
             <td>${etpJour.toFixed(1)}</td>
             <td>${besoin.toFixed(1)}</td>
-            <td>×${cycles} (9×${cycles} = ${volumeTotal} m³)</td>
-            <td>${Math.floor(temps/60)}h ${temps%60}min</td>
-            <td>${volume6Terrains.toFixed(1)}m³ & ${heures6T}h ${minutes6T}min</td>
+            <td>×${cycles}</td>
+            <td>${volumeTotal}m³ & ${Math.floor(temps/60)}h${temps%60}min</td>
+            <td>${volume6Terrains.toFixed(1)}m³ & ${heures6T}h${minutes6T}min</td>
           </tr>
         `;
         table.insertAdjacentHTML("beforeend", ligne);

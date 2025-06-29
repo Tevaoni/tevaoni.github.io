@@ -32,23 +32,39 @@
       background-color: #2a2a2a;
     }
     p { text-align:center; color: #555; }
-    button {
-      background-color: transparent;
-      border: 2px solid #2affaa;
-      color: #2affaa;
-      padding: 0.6em 1.2em;
-      font-size: 1em;
-      font-weight: bold;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 0 5px #2affaa, 0 0 10px #2affaa, 0 0 20px #0fa;
-    }
-    button:hover {
-      background-color: #2affaa;
-      color: #000;
-      box-shadow: 0 0 10px #2affaa, 0 0 20px #2affaa, 0 0 40px #0fa;
-    }
+button {
+  background-color: #2affaa; /* style hover précédent → devient normal */
+  border: 2px solid #2affaa;
+  color: #555;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow:
+    0 0 8px #2affaa,
+    0 0 16px #2affaa,
+    0 0 32px #0fa;
+}
+
+button:hover {
+  background-color: #1a1a1a; /* plus clair */
+  box-shadow:
+    0 0 12px #1a1a1a,
+    0 0 24px #1a1a1a,
+    0 0 48px #0fa;
+}
+
+button:active {
+  background-color: #080808; /* plus sombre */
+  color: #333;
+  box-shadow:
+    0 0 6px #080808,
+    0 0 12px #080808,
+    0 0 24px #0fa;
+  transform: scale(0.97);
+}
   </style>
 </head>
 <body>

@@ -20,6 +20,7 @@
     <tr>
       <th>📅 Date</th>
       <th>🌡️ T° Max / Min</th>
+      <th>🌧️ Pluie (mm)</th>
       <th>🔆 ETP réelle (mm)</th>
       <th>💧 Besoin estimé (m³)</th>
       <th>🔁 Programme</th>
@@ -34,7 +35,7 @@
     const dureeParCycle = 24;
 
     async function afficherProgramme() {
-      const url = "https://api.open-meteo.com/v1/forecast?latitude=49.8942&longitude=2.2633&daily=temperature_2m_max,temperature_2m_min,et0_fao_evapotranspiration&timezone=Europe%2FParis&altitude=22";
+      const url = "https://api.open-meteo.com/v1/forecast?latitude=49.8942&longitude=2.2633&daily=temperature_2m_max,temperature_2m_min,et0_fao_evapotranspiration,precipitation_sum&&timezone=Europe%2FParis&altitude=22";
       const res = await fetch(url);
       const data = await res.json();
       
@@ -48,6 +49,7 @@
       const tMax = data.daily.temperature_2m_max;
       const tMin = data.daily.temperature_2m_min;
       const etp = data.daily.et0_fao_evapotranspiration;
+      const pluie = data.daily.precipitation_sum;
 
       const table = document.getElementById("tableau");
 
@@ -65,12 +67,15 @@
         const temps6Terrains = temps * 5.66;
         const heures6T = Math.floor(temps6Terrains / 60);
         const minutes6T = Math.round(temps6Terrains % 60);
+        // ajoute la précipitation
+        const pluieJour = pluie[i];
 
 
         const ligne = `
           <tr>
             <td>${date}</td>
             <td>${tmax.toFixed(1)}° / ${tmin.toFixed(1)}°</td>
+            <td>${pluieJour.toFixed(1)}</td>
             <td>${etpJour.toFixed(1)}</td>
             <td>${besoin.toFixed(1)}</td>
             <td>×${cycles} (9×${cycles} = ${volumeTotal} m³)</td>

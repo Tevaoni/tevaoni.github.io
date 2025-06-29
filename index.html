@@ -5,7 +5,7 @@
   <title>Arrosage – Amiens</title>
   <style>
     body { font-family: sans-serif; padding: 2em; max-width: 900px; margin: auto; background: #f9f9f9; }
-    h1 { color: #2a7; }
+    h1 { color: #2a7; text-align: center;}
     table { width: 100%; border-collapse: collapse; margin-top: 1em; }
     th, td { padding: 0.7em; border: 1px solid #ccc; text-align: center; }
     th { background: #e8f5e9; }
@@ -18,14 +18,14 @@
 
   <table id="tableau">
     <tr>
-      <th>📅 Date</th>
-      <th>🌡️ T° Min / Max</th>
-      <th>🌧️ Pluie (mm)</th>
-      <th>🔆 ETP (mm)</th>
-      <th>💧 Besoin estimé (m³)</th>
-      <th>🔁 bonus x%</th>
-      <th>⏱️&💧terrain A</th>
-      <th>⏱️&💧tout</th>
+      <th>📅<br>Date</th>
+      <th>🌡️<br>Min/Max</th>
+      <th>🌧️<br>Pluie</th>
+      <th>🔆<br>ETP</th>
+      <th>💧<br>Besoin estimé</th>
+      <th>🔁<br>Bonus</th>
+      <th>⏱️&💧<br>Programme A</th>
+      <th>⏱️&💧<br>Programme tout</th>
     </tr>
   </table>
 
@@ -74,13 +74,13 @@
         const ligne = `
           <tr>
             <td>${date}</td>
-            <td>${tmin.toFixed(1)}° / ${tmax.toFixed(1)}°</td>
-            <td>${pluieJour.toFixed(1)}</td>
-            <td>${etpJour.toFixed(1)}</td>
-            <td>${besoin.toFixed(1)}</td>
-            <td>×${cycles}</td>
-            <td>${volumeTotal}m³ & ${Math.floor(temps/60)}h${temps%60}min</td>
-            <td>${volume6Terrains.toFixed(1)}m³ & ${heures6T}h${minutes6T}min</td>
+            <td>${tmin.toFixed(1)}°C / ${tmax.toFixed(1)}°C</td>
+            <td>${pluieJour.toFixed(1)}mm</td>
+            <td>${etpJour.toFixed(1)}mm</td>
+            <td>${besoin.toFixed(1)}m³</td>
+            <td>${cycles * 100}%</td>
+            <td>${volumeTotal}m³<br>${Math.floor(temps/60)}h${temps%60}min</td>
+            <td>${volume6Terrains.toFixed(1)}m³<br>${heures6T}h${minutes6T}min</td>
           </tr>
         `;
         table.insertAdjacentHTML("beforeend", ligne);

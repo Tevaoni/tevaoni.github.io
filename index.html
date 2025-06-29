@@ -40,12 +40,11 @@
       const url = "https://api.open-meteo.com/v1/forecast?latitude=49.8942&longitude=2.2633&daily=temperature_2m_max,temperature_2m_min,et0_fao_evapotranspiration,precipitation_sum&&timezone=Europe%2FParis&altitude=22";
       const res = await fetch(url);
       const data = await res.json();
-      
-    // ✅ Vérifie que les données sont bien structurées avant d’avancer
-    if (!data.daily || !data.daily.time) {
-      console.error("Erreur dans la réponse API :", data);
-      return;
-    }
+
+      if (!data.daily || !data.daily.time) {
+        console.error("Erreur dans la réponse API :", data);
+        return;
+      }
 
       const jours = data.daily.time;
       const tMax = data.daily.temperature_2m_max;
@@ -54,6 +53,26 @@
       const pluie = data.daily.precipitation_sum;
 
       const table = document.getElementById("tableau");
+
+      // 🔄 Réinitialise le tableau (garde l'en-tête)
+      table.innerHTML = `
+        <tr>
+          <th>📅<br>Date</th>
+          <th>🌡️<br>Min/Max</th>
+          <th>🌧️<br>Pluie</th>
+          <th>🔆<br>ETP</th>
+          <th>💧<br>Besoin estimé</th>
+          <th>🔁<br>Bonus</th>
+          <th>⏱️&💧<br>Programme A</th>
+          <th>⏱️&💧<br>Programme tout</th>
+        </tr>
+      `;
+      
+      // ✅ Vérifie que les données sont bien structurées avant d’avancer
+      if (!data.daily || !data.daily.time) {
+        console.error("Erreur dans la réponse API :", data);
+        return;
+      }
 
       for (let i = 0; i < 7; i++) {
         const date = new Date(jours[i]).toLocaleDateString("fr-FR", { weekday: 'short', day: 'numeric', month: 'short' });

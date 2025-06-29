@@ -24,13 +24,14 @@
       <th>💧 Besoin estimé (m³)</th>
       <th>🔁 Programme</th>
       <th>⏱️ Temps</th>
+      <th>⏱️&💧tout</th>
     </tr>
   </table>
 
   <script>
     const surface = 7500;
     const volumeParCycle = 9;
-    const dureeParCycle = 25;
+    const dureeParCycle = 24;
 
     async function afficherProgramme() {
       const url = "https://api.open-meteo.com/v1/forecast?latitude=49.8942&longitude=2.2633&daily=temperature_2m_max,temperature_2m_min,et0_fao_evapotranspiration&timezone=Europe%2FParis&altitude=22";
@@ -59,6 +60,10 @@
         const cycles = Math.min(6, Math.ceil(besoin / volumeParCycle));
         const volumeTotal = cycles * volumeParCycle;
         const temps = cycles * dureeParCycle;
+        // pour le programme tout
+        const volume6Terrains = volumeTotal * 6;
+        const temps6Terrains = temps * 5.66;
+
 
         const ligne = `
           <tr>
@@ -68,6 +73,8 @@
             <td>${besoin.toFixed(1)}</td>
             <td>×${cycles} (9×${cycles} = ${volumeTotal} m³)</td>
             <td>${Math.floor(temps/60)}h ${temps%60}min</td>
+
+            <td>${volume6Terrains.toFixed(1)}m³ & ${Math.floor(temps6Terrains / 60)}h ${temps6Terrains % 60}min</td>
           </tr>
         `;
         table.insertAdjacentHTML("beforeend", ligne);

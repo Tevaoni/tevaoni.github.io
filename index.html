@@ -1,67 +1,74 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <title>Programme d'Arrosage Automatique</title>
+  <meta charset="UTF-8">
+  <title>Arrosage automatique – Amiens</title>
   <style>
-    body { font-family: sans-serif; margin: 2em; max-width: 900px; }
-    table { border-collapse: collapse; width: 100%; margin-top: 1em; }
-    th, td { border: 1px solid #ccc; padding: 0.6em; text-align: center; }
-    th { background-color: #f0f0f0; }
+    body { font-family: sans-serif; padding: 2em; max-width: 900px; margin: auto; background: #f9f9f9; }
     h1 { color: #2a7; }
+    table { width: 100%; border-collapse: collapse; margin-top: 1em; }
+    th, td { padding: 0.7em; border: 1px solid #ccc; text-align: center; }
+    th { background: #e8f5e9; }
+    tr:nth-child(even) { background-color: #f1f1f1; }
   </style>
 </head>
 <body>
-  <h1>💧 Programme d'Arrosage – Amiens</h1>
-  <p>Calcul automatique basé sur les prévisions météo (Open-Meteo) pour un terrain hybride de <strong>7 500 m²</strong>.</p>
+  <h1>💧 Programme d’arrosage automatique – Stade La Licorne, Amiens</h1>
+  <p>Données météo en direct via <strong>Open-Meteo</strong> pour un terrain de 7 500 m². Mise à jour quotidienne automatique.</p>
 
-  <table id="arrosage">
+  <table id="tableau">
     <tr>
       <th>📅 Date</th>
-      <th>🌡️ T° max</th>
+      <th>🌡️ T° Max / Min</th>
+      <th>🔆 ETP réelle (mm)</th>
       <th>💧 Besoin estimé (m³)</th>
-      <th>🔄 Programme recommandé</th>
-      <th>⏱️ Durée d’arrosage</th>
+      <th>🔁 Programme</th>
+      <th>⏱️ Temps</th>
     </tr>
   </table>
 
   <script>
     const surface = 7500;
-    const cycleVolume = 9;
+    const volumeParCycle = 9;
     const dureeParCycle = 25;
 
-    async function chargerMeteo() {
-      const url = "https://api.open-meteo.com/v1/forecast?latitude=49.89&longitude=2.30&daily=temperature_2m_max&timezone=Europe%2FParis";
+    async function afficherProgramme() {
+      const url = "https://api.open-meteo.com/v1/forecast?latitude=49.8942&longitude=2.2633&daily=temperature_2m_max,temperature_2m_min,evapotranspiration&timezone=Europe%2FParis&altitude=22";
       const res = await fetch(url);
       const data = await res.json();
+
       const jours = data.daily.time;
       const tMax = data.daily.temperature_2m_max;
+      const tMin = data.daily.temperature_2m_min;
+      const etp = data.daily.evapotranspiration;
 
-      const table = document.getElementById("arrosage");
+      const table = document.getElementById("tableau");
 
       for (let i = 0; i < 7; i++) {
-        const date = new Date(jours[i]).toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short" });
-        const temp = tMax[i];
-        const etp = 0.6 * temp; // estimation simplifiée
-        const besoin = (etp * surface) / 1000;
-        const cycles = Math.min(6, Math.ceil(besoin / cycleVolume));
-        const volumeDistribue = cycles * cycleVolume;
-        const duree = cycles * dureeParCycle;
+        const date = new Date(jours[i]).toLocaleDateString("fr-FR", { weekday: 'short', day: 'numeric', month: 'short' });
+        const tmax = tMax[i];
+        const tmin = tMin[i];
+        const etpJour = etp[i];
+        const besoin = (etpJour * surface) / 1000;
+        const cycles = Math.min(6, Math.ceil(besoin / volumeParCycle));
+        const volumeTotal = cycles * volumeParCycle;
+        const temps = cycles * dureeParCycle;
 
         const ligne = `
           <tr>
             <td>${date}</td>
-            <td>${temp.toFixed(1)}°C</td>
+            <td>${tmax.toFixed(1)}° / ${tmin.toFixed(1)}°</td>
+            <td>${etpJour.toFixed(1)}</td>
             <td>${besoin.toFixed(1)}</td>
-            <td>×${cycles} (9 × ${cycles} = ${volumeDistribue} m³)</td>
-            <td>${Math.floor(duree / 60)}h ${duree % 60}min</td>
+            <td>×${cycles} (9×${cycles} = ${volumeTotal} m³)</td>
+            <td>${Math.floor(temps/60)}h ${temps%60}min</td>
           </tr>
         `;
         table.insertAdjacentHTML("beforeend", ligne);
       }
     }
 
-    chargerMeteo();
+    afficherProgramme();
   </script>
 </body>
 </html>

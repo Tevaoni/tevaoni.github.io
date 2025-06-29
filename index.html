@@ -30,9 +30,8 @@
       <th>⏱️&💧<br>Programme tout</th>
     </tr>
   </table>
-
+  <p id="loading" style="text-align:center;">Chargement des données météo...</p>
   <script>
-    document.getElementById("loading").style.display = "none";
     const surface = 7500;
     const volumeParCycle = 9;
     const dureeParCycle = 24;
@@ -91,10 +90,11 @@
         `;
         table.insertAdjacentHTML("beforeend", ligne);
       }
+      // ✅ Masquer le message de chargement une fois les données affichées
+      document.getElementById("loading").style.display = "none";
     }
 
     afficherProgramme();
   </script>
-  <p id="loading" style="text-align:center;">Chargement des données météo...</p>
 </body>
 </html>

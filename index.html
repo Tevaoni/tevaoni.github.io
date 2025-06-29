@@ -1,12 +1,72 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>test page github</title>
+  <meta charset="UTF-8" />
+  <title>🌤️ Arrosage intelligent à Amiens</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2em; max-width: 800px; }
+    h1, h2 { color: #2a7; }
+    label, input, button { display: block; margin-top: 1em; font-size: 1em; }
+    input { padding: 0.4em; width: 100%; max-width: 300px; }
+    button { margin-top: 1em; padding: 0.6em 1em; font-size: 1em; background: #2a7; color: white; border: none; cursor: pointer; }
+    #result { background: #f0f8ff; padding: 1em; margin-top: 2em; border-left: 4px solid #2a7; border-radius: 6px; }
+    iframe { margin-top: 2em; border: none; }
+  </style>
 </head>
 <body>
-    <h1>yoohoo</h1>
+
+  <h1>💧 Calculateur d'Arrosage Intelligent</h1>
+  <p>Ce calcul se base sur l’<strong>ETP journalière</strong> et la <strong>surface de ton terrain</strong>. Le système d’arrosage délivre <strong>9 m³ en 25 minutes</strong>.</p>
+
+  <label>🌿 ETP (mm du jour) :
+    <input type="number" id="etp" value="5.5" step="0.1">
+  </label>
+
+  <label>📐 Surface du terrain (m²) :
+    <input type="number" id="surface" value="7500">
+  </label>
+
+  <button onclick="calculerArrosage()">Calculer</button>
+
+  <div id="result"></div>
+
+  <h2>📍 Météo en direct à Amiens</h2>
+
+  <!-- Widget météo -->
+  <a class="weatherwidget-io" href="https://forecast7.com/fr/49d8942d30/amiens/" data-label_1="AMIENS" data-label_2="Prévisions météo" data-theme="pure" >Amiens Prévisions météo</a>
+  <script>
+    !function(d,s,id){
+      var js,fjs=d.getElementsByTagName(s)[0];
+      if(!d.getElementById(id)){
+        js=d.createElement(s); js.id=id;
+        js.src='https://weatherwidget.io/js/widget.min.js';
+        fjs.parentNode.insertBefore(js,fjs);
+      }
+    }(document,'script','weatherwidget-io-js');
+  </script>
+
+  <script>
+    function calculerArrosage() {
+      const etp = parseFloat(document.getElementById('etp').value);
+      const surface = parseFloat(document.getElementById('surface').value);
+
+      const besoinM3 = (etp * surface) / 1000;
+      const cycleVolume = 9;
+      const dureeParCycle = 25;
+
+      const nbCycles = Math.min(6, Math.ceil(besoinM3 / cycleVolume));
+      const volumeTotal = nbCycles * cycleVolume;
+      const dureeTotal = nbCycles * dureeParCycle;
+
+      document.getElementById('result').innerHTML = `
+        <h2>📊 Résultats</h2>
+        <p>💧 Besoin estimé : <strong>${besoinM3.toFixed(1)} m³</strong></p>
+        <p>🔁 Cycles recommandés : <strong>${nbCycles}</strong> (9 m³ par cycle)</p>
+        <p>💦 Volume total distribué : <strong>${volumeTotal} m³</strong></p>
+        <p>⏱️ Temps d’arrosage : <strong>${dureeTotal} minutes</strong></p>
+      `;
+    }
+  </script>
+
 </body>
 </html>

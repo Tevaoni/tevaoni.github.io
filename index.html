@@ -52,6 +52,7 @@
   <p id="loading" style="text-align:center;">Chargement des données météo...</p>
   <script>
     let derniereDate = null;
+    let donneesPrecedentes = null;
     const surface = 7500;
     const volumeParCycle = 9;
     const dureeParCycle = 24;
@@ -86,7 +87,19 @@
         console.error("Erreur dans la réponse API :", data);
         return;
       }
-
+      const table = document.querySelector("table");
+      table.innerHTML = `
+        <tr>
+          <th>📅<br>Date</th>
+          <th>🌡️<br>Min/Max</th>
+          <th>🔆<br>ETP</th>
+          <th>🌧️<br>Pluie</th>
+          <th>💧<br>Besoin estimé</th>
+          <th>🔁<br>Bonus</th>
+          <th>⏱️&💧<br>Programme A</th>
+          <th>⏱️&💧<br>Programme tout</th>
+        </tr>
+      `;
       for (let i = 0; i < 7; i++) {
         const date = new Date(jours[i]).toLocaleDateString("fr-FR", { weekday: 'short', day: 'numeric', month: 'short' });
         const tmax = tMax[i];

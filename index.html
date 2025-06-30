@@ -100,13 +100,6 @@
       const jours = meteo.time, tMax = meteo.temperature_2m_max, tMin = meteo.temperature_2m_min, etp = meteo.et0_fao_evapotranspiration, pluie = meteo.precipitation_sum;
       const tbody = document.getElementById("contenu-tableau");
       tbody.innerHTML = "";
-
-      for (let i = 0; i < jours.length; i++) {
-        const dateObj = new Date(jours[i]);
-        const isWeekend = [0,6].includes(dateObj.getDay());
-        const date = dateObj.toLocaleDateString("fr-FR", { weekday: 'short', day: 'numeric', month: 'short' });
-        const tmin = tMin[i], tmax = tMax[i], etpJour = etp[i], pluieJour = pluie[i];
-        const besoinNet = Math.max(0, etpJour - pluieJour);
         function calculerBonusPerso(besoinNet) {
           const coeff = besoinNet / 1.2;
           if (coeff > 0 && coeff < 1) {
@@ -114,6 +107,14 @@
           }
           return Math.floor(coeff) * 100;
         }
+      
+      for (let i = 0; i < jours.length; i++) {
+        const dateObj = new Date(jours[i]);
+        const isWeekend = [0,6].includes(dateObj.getDay());
+        const date = dateObj.toLocaleDateString("fr-FR", { weekday: 'short', day: 'numeric', month: 'short' });
+        const tmin = tMin[i], tmax = tMax[i], etpJour = etp[i], pluieJour = pluie[i];
+        const besoinNet = Math.max(0, etpJour - pluieJour);
+
         const bonus = calculerBonusPerso(besoinNet);
         const aucunBesoin = bonus === 0;
         const colonnesProgramme = Object.entries(programmes).map(([nom, p]) => {

@@ -44,7 +44,7 @@
     const dureeParCycle = 24;
 
     async function afficherProgramme() {
-      const url = "https://api.open-meteo.com/v1/forecast?latitude=49.8942&longitude=2.2633&daily=temperature_2m_max,temperature_2m_min,et0_fao_evapotranspiration,precipitation_sum&&timezone=Europe%2FParis&altitude=22";
+      const url = "https://api.open-meteo.com/v1/forecast?latitude=49.8942&longitude=2.2633&daily=temperature_2m_max,temperature_2m_min,et0_fao_evapotranspiration,precipitation_sum&timezone=Europe%2FParis&altitude=22&forecast_days=16";
       const res = await fetch(url);
       const data = await res.json();
 
@@ -85,7 +85,7 @@
           <th>⏱️&💧<br>Programme tout</th>
         </tr>
       `;
-      for (let i = 0; i < 7; i++) {
+      for (let i = 0; i < jours.length; i++) {
         const date = new Date(jours[i]).toLocaleDateString("fr-FR", { weekday: 'short', day: 'numeric', month: 'short' });
         const tmax = tMax[i];
         const tmin = tMin[i];

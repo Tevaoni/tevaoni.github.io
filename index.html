@@ -18,6 +18,9 @@
     th {
       background: #66cc99;
     }
+    .weekend {
+      background-color: #804A80;
+    }
 </style>
 </head>
 <body>
@@ -105,9 +108,12 @@
         const couleurTmin = tmin > 30 ? 'color:red;font-weight:bold;' : '';
         const couleurTmax = tmax > 30 ? 'color:red;font-weight:bold;' : '';
         const couleurETP = etpJour > 6 ? 'color:red;font-weight:bold;' : '';
-        
+        // couleur pour le WE
+        const jourDate = new Date(jours[i]);
+        const jourSemaine = jourDate.getDay(); // 0 = dimanche, 6 = samedi
+        const isWeekend = jourSemaine === 0 || jourSemaine === 6;
+        // couleur si changement à l'actualisation des données
         let changementTmin = '', changementTmax = '', changementETP = '', changementPluie = '';
-        
         if (donneesPrecedentes) {
           if (tmin !== donneesPrecedentes.tmin[i]) changementTmin = 'background-color:#ffd862;';
           if (tmax !== donneesPrecedentes.tmax[i]) changementTmax = 'background-color:#ffd862;';
@@ -116,7 +122,7 @@
         }
         
         const ligne = `
-          <tr>
+          <tr class="${isWeekend ? 'weekend' : ''}">
             <td>${date}</td>
             <td><span style="${changementTmin}${couleurTmin}">${tmin.toFixed(1)}°C</span><br><span style="${changementTmax}${couleurTmax}">${tmax.toFixed(1)}°C</span></td>
             <td style="${changementETP}${couleurETP}">${etpJour.toFixed(1)}mm</td>

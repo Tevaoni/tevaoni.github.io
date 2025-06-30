@@ -134,6 +134,7 @@
             <td style="${couleurETP}">${etpJour.toFixed(1)}mm</td>
             <td style="${pluieColor}">${pluieJour.toFixed(1)}mm</td>
             <td style="${fondBesoin}">${aucunBesoin ? '🚫' : `${Math.min(6, Math.ceil((besoinNet * 46900) / (54 * 1000))) * 100}%<br>${besoinNet.toFixed(1)}mm`}</td>
+            ${colonnesProgramme}
           </tr>
         `;
         tbody.insertAdjacentHTML("beforeend", ligne);

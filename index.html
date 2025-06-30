@@ -137,7 +137,7 @@
             <td><span style="${styleTmin}">${tmin.toFixed(1)}°C</span><br><span style="${styleTmax}">${tmax.toFixed(1)}°C</span></td>
             <td style="${styleETP}">${etpJour.toFixed(1)}mm</td>
             <td style="${stylePluie}">${pluieJour.toFixed(1)}mm</td>
-            <td>${Math.min(6, Math.ceil((besoinNet * 46900) / (54 * 1000))) * 100}%<br>${besoinNet.toFixed(1)}mm</td>
+            <td>${aucunBesoin ? '🚫' : `${Math.min(6, Math.ceil((besoinNet * 46900) / (54 * 1000))) * 100}%<br>${besoinNet.toFixed(1)}mm`}</td>
             ${colonnesProgramme}
           </tr>
         `;

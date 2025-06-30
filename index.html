@@ -16,7 +16,7 @@
     h1 {
       color: #2affaa;
       text-align: center;
-      text-shadow: 0 0 5px #2affaa, 0 0 10px #2affaa, 0 0 20px #2affaa, 0 0 40px #0fa, 0 0 80px #0fa;
+      text-shadow: 0 0 1px #2affaa, 0 0 4px #2affaa, 0 0 16px #2affaa, 0 0 64px #0fa, 0 0 128px #0fa;
     }
     table { width: 100%; border-collapse: collapse; margin-top: 1em; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.6); overflow: hidden; background-color: #222;}
     th, td {
@@ -32,54 +32,17 @@
       background-color: #2a2a2a;
     }
     p { text-align:center; color: #555; }
-button {
-  background-color: #2affaa; /* vert fluo normal */
-  border: 2px solid #2affaa;
-  color: #555;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: bold;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow:
-    0 0 8px #2affaa,
-    0 0 16px #2affaa,
-    0 0 32px #0fa;
-}
-button:hover {
-  background-color: #66ffd9; /* vert fluo plus clair */
-  border-color: #66ffd9;
-  box-shadow:
-    0 0 12px #66ffd9,
-    0 0 24px #66ffd9,
-    0 0 48px #0fa;
-}
-button:active {
-  background-color: #00cc88; /* vert fluo plus foncé */
-  border-color: #00cc88;
-  color: #eee;
-  box-shadow:
-    0 0 6px #00cc88,
-    0 0 12px #00cc88,
-    0 0 24px #0fa;
-  transform: scale(0.97);
-}
   </style>
 </head>
 <body>
   <h1>💧 Programme d’arrosage automatique</h1>
   <p>Données météo en direct via <strong>Open-Meteo</strong> :</p>
-  <div style="text-align:center; margin-top: 1em;">
-    <button onclick="afficherProgramme()">🔄 Rafraîchir</button>
-  </div>
-
-  <table id="tableau">
+  <table>
     <tr>
       <th>📅<br>Date</th>
       <th>🌡️<br>Min/Max</th>
-      <th>🌧️<br>Pluie</th>
       <th>🔆<br>ETP</th>
+      <th>🌧️<br>Pluie</th>
       <th>💧<br>Besoin estimé</th>
       <th>🔁<br>Bonus</th>
       <th>⏱️&💧<br>Programme A</th>
@@ -88,6 +51,7 @@ button:active {
   </table>
   <p id="loading" style="text-align:center;">Chargement des données météo...</p>
   <script>
+    let derniereDate = null;
     const surface = 7500;
     const volumeParCycle = 9;
     const dureeParCycle = 24;
@@ -97,6 +61,15 @@ button:active {
       const res = await fetch(url);
       const data = await res.json();
 
+      const nouvelleDate = data.daily?.time?.[0];
+      if (nouvelleDate === derniereDate) {
+        console.log("⏳ Données non mises à jour, attente...");
+      return;
+      }
+      derniereDate = nouvelleDate;
+  
+      // ⬇️ ton code existant ici pour actualiser le tableau ⬇️
+      
       if (!data.daily || !data.daily.time) {
         console.error("Erreur dans la réponse API :", data);
         return;
@@ -108,22 +81,6 @@ button:active {
       const etp = data.daily.et0_fao_evapotranspiration;
       const pluie = data.daily.precipitation_sum;
 
-      const table = document.getElementById("tableau");
-
-      // 🔄 Réinitialise le tableau (garde l'en-tête)
-      table.innerHTML = `
-        <tr>
-          <th>📅<br>Date</th>
-          <th>🌡️<br>Min/Max</th>
-          <th>🌧️<br>Pluie</th>
-          <th>🔆<br>ETP</th>
-          <th>💧<br>Besoin estimé</th>
-          <th>🔁<br>Bonus</th>
-          <th>⏱️&💧<br>Programme A</th>
-          <th>⏱️&💧<br>Programme tout</th>
-        </tr>
-      `;
-      
       // ✅ Vérifie que les données sont bien structurées avant d’avancer
       if (!data.daily || !data.daily.time) {
         console.error("Erreur dans la réponse API :", data);
@@ -150,13 +107,22 @@ button:active {
         const couleurTmin = tmin > 30 ? 'style="color:red;font-weight:bold;"' : '';
         const couleurTmax = tmax > 30 ? 'style="color:red;font-weight:bold;"' : '';
         const couleurETP = etpJour > 6 ? 'style="color:red;font-weight:bold;"' : '';
-
+        
+        let changementTmin = '', changementTmax = '', changementETP = '', changementPluie = '';
+        
+        if (donneesPrecedentes) {
+          if (tmin !== donneesPrecedentes.tmin[i]) changementTmin = 'style="background-color:#1e602c;"';
+          if (tmax !== donneesPrecedentes.tmax[i]) changementTmax = 'style="background-color:#1e602c;"';
+          if (etpJour !== donneesPrecedentes.etp[i]) changementETP = 'style="background-color:#1e602c;"';
+          if (pluieJour !== donneesPrecedentes.pluie[i]) changementPluie = 'style="background-color:#1e602c;"';
+        }
+        
         const ligne = `
           <tr>
             <td>${date}</td>
-            <td><span ${couleurTmin}>${tmin.toFixed(1)}°</span> / <span ${couleurTmax}>${tmax.toFixed(1)}°</span></td>
-            <td ${pluieColor}>${pluieJour.toFixed(1)}mm</td>
-            <td><span ${couleurETP}>${etpJour.toFixed(1)}mm</span></td>
+            <td><span ${changementTmin} ${couleurTmin}>${tmin.toFixed(1)}°</span><br><span ${changementTmax} ${couleurTmax}>${tmax.toFixed(1)}°</span></td>
+            <td ${changementETP} ${couleurETP}>${etpJour.toFixed(1)}mm</td>
+            <td ${changementPluie} ${pluieColor}>${pluieJour.toFixed(1)}mm</td>
             <td>${besoin.toFixed(1)}m³</td>
             <td>${cycles * 100}%</td>
             <td>${volumeTotal}m³<br>${Math.floor(temps/60)}h${temps%60}min</td>
@@ -167,9 +133,17 @@ button:active {
       }
       // ✅ Masquer le message de chargement une fois les données affichées
       document.getElementById("loading").style.display = "none";
+      donneesPrecedentes = {
+      tmin: [...tMin],
+      tmax: [...tMax],
+      etp: [...etp],
+      pluie: [...pluie]
+      };
     }
 
     afficherProgramme();
+    // ⏱️ Rafraîchir automatiquement toutes les 3 heures (3 × 60 × 60 × 1000 ms)
+    setInterval(afficherProgramme, 1 * 60 * 60 * 1000);
   </script>
 </body>
 </html>

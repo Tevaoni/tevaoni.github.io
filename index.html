@@ -80,8 +80,7 @@
           <th>🌡️<br>Min/Max</th>
           <th>🔆<br>ETP</th>
           <th>🌧️<br>Pluie</th>
-          <th>💧<br>Besoin estimé</th>
-          <th>🔁<br>Bonus</th>
+          <th>💧<br>Besoin</th>
           <th>⏱️&💧<br>Programme A</th>
           <th>⏱️&💧<br>Programme tout</th>
         </tr>
@@ -91,7 +90,8 @@
         const tmax = tMax[i];
         const tmin = tMin[i];
         const etpJour = etp[i];
-        const besoin = (etpJour * surface) / 1000;
+        const besoinNet = Math.max(0, (etpJour - pluieJour)); // en mm
+        const besoin = (besoinNet * surface) / 1000; // en m³
         const cycles = Math.min(6, Math.ceil(besoin / volumeParCycle));
         const volumeTotal = cycles * volumeParCycle;
         const temps = cycles * dureeParCycle;
@@ -102,28 +102,27 @@
         const minutes6T = Math.round(temps6Terrains % 60);
         // ajoute la précipitation
         const pluieJour = pluie[i];
-        const pluieColor = pluieJour > 0 ? 'style="color:blue;font-weight:bold;"' : '';
-        const couleurTmin = tmin > 30 ? 'style="color:red;font-weight:bold;"' : '';
-        const couleurTmax = tmax > 30 ? 'style="color:red;font-weight:bold;"' : '';
-        const couleurETP = etpJour > 6 ? 'style="color:red;font-weight:bold;"' : '';
+        const pluieColor = pluieJour > 0 ? 'color:blue;font-weight:bold;' : '';
+        const couleurTmin = tmin > 30 ? 'color:red;font-weight:bold;' : '';
+        const couleurTmax = tmax > 30 ? 'color:red;font-weight:bold;' : '';
+        const couleurETP = etpJour > 6 ? 'color:red;font-weight:bold;' : '';
         
         let changementTmin = '', changementTmax = '', changementETP = '', changementPluie = '';
         
         if (donneesPrecedentes) {
-          if (tmin !== donneesPrecedentes.tmin[i]) changementTmin = 'style="background-color:#ffd862;"';
-          if (tmax !== donneesPrecedentes.tmax[i]) changementTmax = 'style="background-color:#ffd862;"';
-          if (etpJour !== donneesPrecedentes.etp[i]) changementETP = 'style="background-color:#ffd862;"';
-          if (pluieJour !== donneesPrecedentes.pluie[i]) changementPluie = 'style="background-color:#ffd862;"';
+          if (tmin !== donneesPrecedentes.tmin[i]) changementTmin = 'background-color:#ffd862;';
+          if (tmax !== donneesPrecedentes.tmax[i]) changementTmax = 'background-color:#ffd862;';
+          if (etpJour !== donneesPrecedentes.etp[i]) changementETP = 'background-color:#ffd862;';
+          if (pluieJour !== donneesPrecedentes.pluie[i]) changementPluie = 'background-color:#ffd862;';
         }
         
         const ligne = `
           <tr>
             <td>${date}</td>
-            <td><span ${changementTmin} ${couleurTmin}>${tmin.toFixed(1)}°</span><br><span ${changementTmax} ${couleurTmax}>${tmax.toFixed(1)}°</span></td>
-            <td ${changementETP} ${couleurETP}>${etpJour.toFixed(1)}mm</td>
-            <td ${changementPluie} ${pluieColor}>${pluieJour.toFixed(1)}mm</td>
-            <td>${besoin.toFixed(1)}m³</td>
-            <td>${cycles * 100}%</td>
+            <td><span style="${changementTmin}${couleurTmin}">${tmin.toFixed(1)}°C</span><br><span style="${changementTmax}${couleurTmax}">${tmax.toFixed(1)}°C</span></td>
+            <td style="${changementETP}${couleurETP}">${etpJour.toFixed(1)}mm</td>
+            <td style="${changementPluie}${pluieColor}">${pluieJour.toFixed(1)}mm</td>
+            <td>${besoinNet.toFixed(1)}mm<br>${cycles * 100}%</td>
             <td>${volumeTotal}m³<br>${Math.floor(temps/60)}h${temps%60}min</td>
             <td>${volume6Terrains.toFixed(1)}m³<br>${heures6T}h${minutes6T}min</td>
           </tr>

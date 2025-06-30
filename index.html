@@ -105,20 +105,7 @@
         const couleurTmin = tmin > 30 ? 'color:red;font-weight:bold;' : '';
         const couleurTmax = tmax > 30 ? 'color:red;font-weight:bold;' : '';
         const couleurETP = etpJour > 6 ? 'color:red;font-weight:bold;' : '';
-
-        let changementTmin = '', changementTmax = '', changementETP = '', changementPluie = '';
-        if (donneesPrecedentes) {
-          if (tmin.toFixed(1) !== donneesPrecedentes.tmin[i].toFixed(1)) changementTmin = 'background-color:#ffd862;';
-          if (tmax.toFixed(1) !== donneesPrecedentes.tmax[i].toFixed(1)) changementTmax = 'background-color:#ffd862;';
-          if (etpJour.toFixed(1) !== donneesPrecedentes.etp[i].toFixed(1)) changementETP = 'background-color:#ffd862;';
-          if (pluieJour.toFixed(1) !== donneesPrecedentes.pluie[i].toFixed(1)) changementPluie = 'background-color:#ffd862;';
-        }
-
-        const styleTmin = [changementTmin, couleurTmin].filter(Boolean).join('');
-        const styleTmax = [changementTmax, couleurTmax].filter(Boolean).join('');
-        const styleETP = [changementETP, couleurETP].filter(Boolean).join('');
-        const stylePluie = [changementPluie, pluieColor].filter(Boolean).join('');
-
+        
         const colonnesProgramme = Object.entries(programmes).map(([nom, p]) => {
           if (aucunBesoin) {
               return `<td class="programme-cellule-${nom}" style="display:none;">🚫<br>Aucun arrosage</td>`;
@@ -143,9 +130,9 @@
         const ligne = `
           <tr>
             <td class="${isWeekend ? 'weekend' : ''}">${date}</td>
-            <td><span style="${styleTmin}">${tmin.toFixed(1)}°C</span><br><span style="${styleTmax}">${tmax.toFixed(1)}°C</span></td>
-            <td style="${styleETP}">${etpJour.toFixed(1)}mm</td>
-            <td style="${stylePluie}">${pluieJour.toFixed(1)}mm</td>
+            <td><span style="${couleurTmin}">${tmin.toFixed(1)}°C</span><br><span style="${couleurTmax}">${tmax.toFixed(1)}°C</span></td>
+            <td style="${couleurETP}">${etpJour.toFixed(1)}mm</td>
+            <td style="${pluieColor}">${pluieJour.toFixed(1)}mm</td>
             <td style="${fondBesoin}">${aucunBesoin ? '🚫' : `${Math.min(6, Math.ceil((besoinNet * 46900) / (54 * 1000))) * 100}%<br>${besoinNet.toFixed(1)}mm`}</td>
           </tr>
         `;

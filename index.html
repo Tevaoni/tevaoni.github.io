@@ -120,18 +120,25 @@
         // couleur si changement à l'actualisation des données
         let changementTmin = '', changementTmax = '', changementETP = '', changementPluie = '';
         if (donneesPrecedentes) {
-          if (tmin !== donneesPrecedentes.tmin[i]) changementTmin = 'background-color:#ffd862;';
-          if (tmax !== donneesPrecedentes.tmax[i]) changementTmax = 'background-color:#ffd862;';
-          if (etpJour !== donneesPrecedentes.etp[i]) changementETP = 'background-color:#ffd862;';
-          if (pluieJour !== donneesPrecedentes.pluie[i]) changementPluie = 'background-color:#ffd862;';
+          if (tmin.toFixed(1) !== donneesPrecedentes.tmin[i].toFixed(1)) changementTmin = 'background-color:#ffd862;';
+          if (tmax.toFixed(1) !== donneesPrecedentes.tmax[i].toFixed(1)) changementTmax = 'background-color:#ffd862;';
+          if (etpJour.toFixed(1) !== donneesPrecedentes.etp[i].toFixed(1)) changementETP = 'background-color:#ffd862;';
+          if (pluieJour.toFixed(1) !== donneesPrecedentes.pluie[i].toFixed(1)) changementPluie = 'background-color:#ffd862;';
         }
+
+        // fusionne les styles
+        const styleTmin = [changementTmin, couleurTmin].filter(Boolean).join('');
+        const styleTmax = [changementTmax, couleurTmax].filter(Boolean).join('');
+        const styleETP = [changementETP, couleurETP].filter(Boolean).join('');
+        const stylePluie = [changementPluie, pluieColor].filter(Boolean).join('');
+
         
         const ligne = `
           <tr>
             <td class="${isWeekend ? 'weekend' : ''}">${date}</td>
-            <td><span style="${changementTmin}${couleurTmin}">${tmin.toFixed(1)}°C</span><br><span style="${changementTmax}${couleurTmax}">${tmax.toFixed(1)}°C</span></td>
-            <td style="${changementETP}${couleurETP}">${etpJour.toFixed(1)}mm</td>
-            <td style="${changementPluie}${pluieColor}">${pluieJour.toFixed(1)}mm</td>
+            <td><span style="${styleTmin}">${tmin.toFixed(1)}°C</span><br><span style="${styleTmax}">${tmax.toFixed(1)}°C</span></td>
+            <td style="${styleETP}">${etpJour.toFixed(1)}mm</td>
+            <td style="${stylePluie}">${pluieJour.toFixed(1)}mm</td>
             <td>${besoinNet.toFixed(1)}mm<br>${cycles * 100}%</td>
             <td>${volumeTotal}m³<br>${Math.floor(temps/60)}h${temps%60}min</td>
             <td>${volume6Terrains.toFixed(1)}m³<br>${heures6T}h${minutes6T}min</td>

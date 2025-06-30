@@ -131,8 +131,8 @@
         }).join('');
 
         const ligne = `
-          <tr class="${isWeekend ? 'weekend' : ''}">
-            <td>${date}</td>
+          <tr>
+            <td class="${isWeekend ? 'weekend' : ''}">${date}</td>
             <td><span style="${styleTmin}">${tmin.toFixed(1)}°C</span><br><span style="${styleTmax}">${tmax.toFixed(1)}°C</span></td>
             <td style="${styleETP}">${etpJour.toFixed(1)}mm</td>
             <td style="${stylePluie}">${pluieJour.toFixed(1)}mm</td>

@@ -128,9 +128,13 @@
             Apport : ${apport.toFixed(1)} mm
           </td>`;
         }).join('');
-const ancienBesoinNet = Math.max(0, donneesPrecedentes.etp[i] - donneesPrecedentes.pluie[i]);
-const fondBesoin = donneesPrecedentes ? styleVariation(besoinNet, ancienBesoinNet) : '';
-        
+let ancienBesoinNet = 0;
+let fondBesoin = '';
+
+if (donneesPrecedentes && donneesPrecedentes.etp && donneesPrecedentes.pluie) {
+  ancienBesoinNet = Math.max(0, donneesPrecedentes.etp[i] - donneesPrecedentes.pluie[i]);
+  fondBesoin = styleVariation(besoinNet, ancienBesoinNet);
+}
             function calculerBonusPerso(besoinNet) {
       const coeff = besoinNet / 1.2;
       if (coeff > 0 && coeff < 1) {

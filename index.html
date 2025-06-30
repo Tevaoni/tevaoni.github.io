@@ -122,8 +122,8 @@
         }
         
         const ligne = `
-          <tr class="${isWeekend ? 'weekend' : ''}">
-            <td>${date}</td>
+          <tr>
+            <td class="${isWeekend ? 'weekend' : ''}">${date}</td>
             <td><span style="${changementTmin}${couleurTmin}">${tmin.toFixed(1)}°C</span><br><span style="${changementTmax}${couleurTmax}">${tmax.toFixed(1)}°C</span></td>
             <td style="${changementETP}${couleurETP}">${etpJour.toFixed(1)}mm</td>
             <td style="${changementPluie}${pluieColor}">${pluieJour.toFixed(1)}mm</td>

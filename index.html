@@ -124,16 +124,16 @@
         const etpJour = etp[i];
         const pluieJour = pluie[i];
         const besoinNet = Math.max(0, (etpJour - pluieJour)); // en mm
+        const programmeActif = document.querySelector('input[name="terrain"]:checked').value;
+        const { surface, volume: volumeParCycle, duree: dureeParCycle } = programmes[programmeActif];
         const besoin = (besoinNet * surface) / 1000; // en m³
         const cycles = Math.min(6, Math.ceil(besoin / volumeParCycle));
         const volumeTotal = cycles * volumeParCycle;
         const temps = cycles * dureeParCycle;
+        const volumeApplique = (volume * cycles);
+        const dureeApplique = duree * cycles;
+        const apportMM = (volumeApplique / surface) * 1000;
   
-        // pour le programme tout
-        const volume6Terrains = volumeTotal * 6;
-        const temps6Terrains = temps * 5.66;
-        const heures6T = Math.floor(temps6Terrains / 60);
-        const minutes6T = Math.round(temps6Terrains % 60);
         const pluieColor = pluieJour > 0 ? 'color:blue;font-weight:bold;' : '';
         const couleurTmin = tmin > 30 ? 'color:red;font-weight:bold;' : '';
         const couleurTmax = tmax > 30 ? 'color:red;font-weight:bold;' : '';
@@ -156,10 +156,6 @@
         const styleTmax = [changementTmax, couleurTmax].filter(Boolean).join('');
         const styleETP = [changementETP, couleurETP].filter(Boolean).join('');
         const stylePluie = [changementPluie, pluieColor].filter(Boolean).join('');
-  
-        const volumeApplique = (volume * cycles);
-        const dureeApplique = duree * cycles;
-        const apportMM = (volumeApplique / surface) * 1000;
         
         const ligne = `
           <tr>

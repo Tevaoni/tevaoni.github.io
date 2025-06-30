@@ -94,19 +94,21 @@
         console.error("❌ Erreur météo :", err);
       }
     }
-
+    
+    function calculerBonusPerso(besoinNet) {
+      const coeff = besoinNet / 1.2;
+      if (coeff > 0 && coeff < 1) {
+        return coeff > 0.4 ? 100 : 0;
+      }
+      return Math.floor(coeff) * 100;
+    }
+    
     function afficherProgramme() {
       if (!meteo) return;
       const jours = meteo.time, tMax = meteo.temperature_2m_max, tMin = meteo.temperature_2m_min, etp = meteo.et0_fao_evapotranspiration, pluie = meteo.precipitation_sum;
       const tbody = document.getElementById("contenu-tableau");
       tbody.innerHTML = "";
-        function calculerBonusPerso(besoinNet) {
-          const coeff = besoinNet / 1.2;
-          if (coeff > 0 && coeff < 1) {
-            return coeff > 0.4 ? 100 : 0;
-          }
-          return Math.floor(coeff) * 100;
-        }
+
       
       for (let i = 0; i < jours.length; i++) {
         const dateObj = new Date(jours[i]);
@@ -134,10 +136,11 @@
           </td>`;
         }).join('');
         let ancienBesoinNet = 0;
+        let fondBesoin = '';
         if (donneesPrecedentes && donneesPrecedentes.etp && donneesPrecedentes.pluie) {
           ancienBesoinNet = Math.max(0, donneesPrecedentes.etp[i] - donneesPrecedentes.pluie[i]);
+          fondBesoin = styleVariation(besoinNet, ancienBesoinNet);
         }
-        const fondBesoin = donneesPrecedentes ? styleVariation(besoinNet, ancienBesoinNet) : '';
 
         const ligne = `
           <tr>

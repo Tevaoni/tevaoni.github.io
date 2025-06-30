@@ -80,11 +80,19 @@
     }
 
     async function chargerMeteo() {
-      const url = "https://api.open-meteo.com/v1/forecast?latitude=49.8942&longitude=2.2633&daily=temperature_2m_max,temperature_2m_min,et0_fao_evapotranspiration,precipitation_sum&timezone=Europe%2FParis&altitude=22&forecast_days=16";
-      const res = await fetch(url);
-      const data = await res.json();
-      meteo = data.daily;
-      afficherProgramme();
+      try {
+        const url = "https://api.open-meteo.com/v1/forecast?latitude=49.8942&longitude=2.2633&daily=temperature_2m_max,temperature_2m_min,et0_fao_evapotranspiration,precipitation_sum&timezone=Europe%2FParis&altitude=22&forecast_days=16";
+        const res = await fetch(url);
+        const data = await res.json();
+        if (!data || !data.daily || !data.daily.time) {
+          throw new Error("Données météo incomplètes.");
+        }
+        meteo = data.daily;
+        afficherProgramme();
+      } catch (err) {
+        document.getElementById("loading").textContent = "Erreur de chargement météo.";
+        console.error("❌ Erreur météo :", err);
+      }
     }
 
     function afficherProgramme() {
@@ -101,11 +109,6 @@
         const besoinNet = Math.max(0, etpJour - pluieJour);
         const aucunBesoin = besoinNet === 0;
 
-        const pluieColor = pluieJour > 0 ? 'color:blue;font-weight:bold;' : '';
-        const couleurTmin = tmin > 30 ? 'color:red;font-weight:bold;' : '';
-        const couleurTmax = tmax > 30 ? 'color:red;font-weight:bold;' : '';
-        const couleurETP = etpJour > 6 ? 'color:red;font-weight:bold;' : '';
-        
         const colonnesProgramme = Object.entries(programmes).map(([nom, p]) => {
           if (aucunBesoin) {
               return `<td class="programme-cellule-${nom}" style="display:none;">🚫<br>Aucun arrosage</td>`;
@@ -123,17 +126,30 @@
           </td>`;
         }).join('');
 
-        const fondBesoin = donneesPrecedentes
-          ? styleVariation(besoinNet, (etp[i] - pluie[i]))
-          : '';
-        
+        const ancienBesoinNet = Math.max(0, donneesPrecedentes.etp[i] - donneesPrecedentes.pluie[i]);
+        const fondBesoin = donneesPrecedentes ? styleVariation(besoinNet, ancienBesoinNet) : '';
+        function calculerBonusPerso(besoinNet) {
+          const coeff = besoinNet / 1.2;
+          if (coeff > 0 && coeff < 1) {
+            return coeff > 0.4 ? 100 : 0;
+          }
+          return Math.floor(coeff) * 100;
+        }
         const ligne = `
           <tr>
             <td class="${isWeekend ? 'weekend' : ''}">${date}</td>
-            <td><span style="${couleurTmin}">${tmin.toFixed(1)}°C</span><br><span style="${couleurTmax}">${tmax.toFixed(1)}°C</span></td>
-            <td style="${couleurETP}">${etpJour.toFixed(1)}mm</td>
-            <td style="${pluieColor}">${pluieJour.toFixed(1)}mm</td>
-            <td style="${fondBesoin}">${aucunBesoin ? '🚫' : `${Math.min(6, Math.ceil((besoinNet * 46900) / (54 * 1000))) * 100}%<br>${besoinNet.toFixed(1)}mm`}</td>
+            <td>
+              <span style="${tmin < 5 ? 'color:blue;font-weight:bold;' : tmin > 30 ? 'color:red;font-weight:bold;' : ''}">${tmin.toFixed(1)}°C</span>
+              <br>
+              <span style="${tmax < 5 ? 'color:blue;font-weight:bold;' : tmax > 30 ? 'color:red;font-weight:bold;' : ''}">${tmax.toFixed(1)}°C</span>
+            </td>
+            <td style="${etpJour > 6 ? 'color:red;font-weight:bold;' : ''}">${etpJour.toFixed(1)}mm</td>
+            <td style="${pluieJour > 1 ? 'color:blue;font-weight:bold;' : ''}">${pluieJour.toFixed(1)}mm</td>
+            <td style="${fondBesoin}">
+              ${aucunBesoin ? '🚫' : `${calculerBonusPerso(besoinNet)}%
+              <br>
+              ${besoinNet.toFixed(1)}mm`}
+            </td>
             ${colonnesProgramme}
           </tr>
         `;

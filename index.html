@@ -109,13 +109,7 @@
         const tmin = tMin[i], tmax = tMax[i], etpJour = etp[i], pluieJour = pluie[i];
         const besoinNet = Math.max(0, etpJour - pluieJour);
 
-            function calculerBonusPerso(besoinNet) {
-      const coeff = besoinNet / 1.2;
-      if (coeff > 0 && coeff < 1) {
-        return coeff > 0.4 ? 100 : 0;
-      }
-      return Math.floor(coeff) * 100;
-    }
+
         const bonus = calculerBonusPerso(besoinNet);
         const aucunBesoin = bonus === 0;
         const colonnesProgramme = Object.entries(programmes).map(([nom, p]) => {
@@ -135,8 +129,16 @@
           </td>`;
         }).join('');
 const ancienBesoinNet = Math.max(0, donneesPrecedentes.etp[i] - donneesPrecedentes.pluie[i]);
-        const fondBesoin = styleVariation(besoinNet, ancienBesoinNet);
-
+const fondBesoin = donneesPrecedentes ? styleVariation(besoinNet, ancienBesoinNet) : '';
+        
+            function calculerBonusPerso(besoinNet) {
+      const coeff = besoinNet / 1.2;
+      if (coeff > 0 && coeff < 1) {
+        return coeff > 0.4 ? 100 : 0;
+      }
+      return Math.floor(coeff) * 100;
+    }
+        
         const ligne = `
           <tr>
             <td class="${isWeekend ? 'weekend' : ''}">${date}</td>

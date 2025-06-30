@@ -149,7 +149,7 @@
             <td style="${etpJour > 6 ? 'color:red;font-weight:bold;' : ''}">${etpJour.toFixed(1)}mm</td>
             <td style="${pluieJour > 1 ? 'color:blue;font-weight:bold;' : ''}">${pluieJour.toFixed(1)}mm</td>
             <td style="${fondBesoin}">
-              ${aucunBesoin ? '🚫' : `${calculerBonusPerso(besoinNet)}%
+              ${aucunBesoin ? '🚫' : `${bonus}%
               <br>
               ${besoinNet.toFixed(1)}mm`}
             </td>

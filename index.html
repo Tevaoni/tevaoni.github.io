@@ -107,6 +107,12 @@
         const isWeekend = [0,6].includes(dateObj.getDay());
         const date = dateObj.toLocaleDateString("fr-FR", { weekday: 'short', day: 'numeric', month: 'short' });
         const tmin = tMin[i], tmax = tMax[i], etpJour = etp[i], pluieJour = pluie[i];
+        
+        if (etpJour == null || pluieJour == null || tmin == null || tmax == null) {
+          console.warn(`⚠️ Données météo manquantes pour le jour ${i}`);
+          continue; // saute ce jour
+        }
+        
         const besoinNet = Math.max(0, etpJour - pluieJour);
 
 

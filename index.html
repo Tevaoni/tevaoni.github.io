@@ -47,7 +47,7 @@
         <th>🔆<br>ETP</th>
         <th>🌧️<br>Pluie</th>
         <th>💧<br>Besoin</th>
-        <th>💻<br>Programme</th>
+        <th>🧮<br>Programme</th>
       </tr>
     </thead>
     <tbody id="contenu-tableau"></tbody>
@@ -94,6 +94,7 @@
         const date = dateObj.toLocaleDateString("fr-FR", { weekday: 'short', day: 'numeric', month: 'short' });
         const tmin = tMin[i], tmax = tMax[i], etpJour = etp[i], pluieJour = pluie[i];
         const besoinNet = Math.max(0, etpJour - pluieJour);
+        const aucunBesoin = besoinNet === 0;
 
         const pluieColor = pluieJour > 0 ? 'color:blue;font-weight:bold;' : '';
         const couleurTmin = tmin > 30 ? 'color:red;font-weight:bold;' : '';
@@ -114,6 +115,9 @@
         const stylePluie = [changementPluie, pluieColor].filter(Boolean).join('');
 
         const colonnesProgramme = Object.entries(programmes).map(([nom, p]) => {
+          if (aucunBesoin) {
+              return `<td class="programme-cellule-${nom}" style="display:none;">🚫<br>Aucun arrosage</td>`;
+          }
           const besoin = (besoinNet * p.surface) / 1000;
           const cycles = Math.min(6, Math.ceil(besoin / p.volume));
           const volume = cycles * p.volume;

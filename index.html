@@ -193,7 +193,8 @@
     setInterval(afficherProgramme, 10 * 60 * 1000);
     // Recalculer à chaque sélection de programme
     document.querySelectorAll('input[name="terrain"]').forEach(radio => {
-    radio.addEventListener("change", afficherProgramme);
+      radio.addEventListener("change", afficherProgramme);
+    });
   </script>
 </body>
 </html>

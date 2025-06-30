@@ -90,6 +90,7 @@
         const tmax = tMax[i];
         const tmin = tMin[i];
         const etpJour = etp[i];
+        const pluieJour = pluie[i];
         const besoinNet = Math.max(0, (etpJour - pluieJour)); // en mm
         const besoin = (besoinNet * surface) / 1000; // en m³
         const cycles = Math.min(6, Math.ceil(besoin / volumeParCycle));
@@ -100,8 +101,6 @@
         const temps6Terrains = temps * 5.66;
         const heures6T = Math.floor(temps6Terrains / 60);
         const minutes6T = Math.round(temps6Terrains % 60);
-        // ajoute la précipitation
-        const pluieJour = pluie[i];
         const pluieColor = pluieJour > 0 ? 'color:blue;font-weight:bold;' : '';
         const couleurTmin = tmin > 30 ? 'color:red;font-weight:bold;' : '';
         const couleurTmax = tmax > 30 ? 'color:red;font-weight:bold;' : '';

@@ -3,6 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <title>Arrosage – Amiens</title>
+  <style>
+    body {
+      text-align:center;
+    }
+    table {border-collapse: collapse; margin: 0 auto;}
+    th, td {
+      padding: 0.7em;
+      border: 1px solid #444;
+    }
+    th {
+      background: #2a7;
+    }
+</style>
 </head>
 <body>
   <h1>💧 Programme d’arrosage automatique</h1>
@@ -19,7 +32,7 @@
       <th>⏱️&💧<br>Programme tout</th>
     </tr>
   </table>
-  <p id="loading" style="text-align:center;">Chargement des données météo...</p>
+  <p id="loading">Chargement des données météo...</p>
   <script>
     let derniereDate = null;
     let donneesPrecedentes = null;
@@ -94,10 +107,10 @@
         let changementTmin = '', changementTmax = '', changementETP = '', changementPluie = '';
         
         if (donneesPrecedentes) {
-          if (tmin !== donneesPrecedentes.tmin[i]) changementTmin = 'style="background-color:#1e602c;"';
-          if (tmax !== donneesPrecedentes.tmax[i]) changementTmax = 'style="background-color:#1e602c;"';
-          if (etpJour !== donneesPrecedentes.etp[i]) changementETP = 'style="background-color:#1e602c;"';
-          if (pluieJour !== donneesPrecedentes.pluie[i]) changementPluie = 'style="background-color:#1e602c;"';
+          if (tmin !== donneesPrecedentes.tmin[i]) changementTmin = 'style="background-color:#ffd862;"';
+          if (tmax !== donneesPrecedentes.tmax[i]) changementTmax = 'style="background-color:#ffd862;"';
+          if (etpJour !== donneesPrecedentes.etp[i]) changementETP = 'style="background-color:#ffd862;"';
+          if (pluieJour !== donneesPrecedentes.pluie[i]) changementPluie = 'style="background-color:#ffd862;"';
         }
         
         const ligne = `

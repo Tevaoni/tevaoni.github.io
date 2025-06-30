@@ -95,14 +95,6 @@
       }
     }
     
-    function calculerBonusPerso(besoinNet) {
-      const coeff = besoinNet / 1.2;
-      if (coeff > 0 && coeff < 1) {
-        return coeff > 0.4 ? 100 : 0;
-      }
-      return Math.floor(coeff) * 100;
-    }
-    
     function afficherProgramme() {
       if (!meteo) return;
       const jours = meteo.time, tMax = meteo.temperature_2m_max, tMin = meteo.temperature_2m_min, etp = meteo.et0_fao_evapotranspiration, pluie = meteo.precipitation_sum;
@@ -117,6 +109,13 @@
         const tmin = tMin[i], tmax = tMax[i], etpJour = etp[i], pluieJour = pluie[i];
         const besoinNet = Math.max(0, etpJour - pluieJour);
 
+            function calculerBonusPerso(besoinNet) {
+      const coeff = besoinNet / 1.2;
+      if (coeff > 0 && coeff < 1) {
+        return coeff > 0.4 ? 100 : 0;
+      }
+      return Math.floor(coeff) * 100;
+    }
         const bonus = calculerBonusPerso(besoinNet);
         const aucunBesoin = bonus === 0;
         const colonnesProgramme = Object.entries(programmes).map(([nom, p]) => {
@@ -135,12 +134,8 @@
             Apport : ${apport.toFixed(1)} mm
           </td>`;
         }).join('');
-        let ancienBesoinNet = 0;
-        let fondBesoin = '';
-        if (donneesPrecedentes && donneesPrecedentes.etp && donneesPrecedentes.pluie) {
-          ancienBesoinNet = Math.max(0, donneesPrecedentes.etp[i] - donneesPrecedentes.pluie[i]);
-          fondBesoin = styleVariation(besoinNet, ancienBesoinNet);
-        }
+const ancienBesoinNet = Math.max(0, donneesPrecedentes.etp[i] - donneesPrecedentes.pluie[i]);
+        const fondBesoin = styleVariation(besoinNet, ancienBesoinNet);
 
         const ligne = `
           <tr>

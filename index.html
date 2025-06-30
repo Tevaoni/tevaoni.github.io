@@ -5,9 +5,7 @@
   <title>Arrosage – Amiens</title>
   <style>
     body {
-      text-align: center;
-      margin: 0;
-      padding: 1em;
+      text-align:center;
     }
     h1 {
       color: #22aa77;
@@ -16,7 +14,7 @@
       border-collapse: collapse;
       width: 100%;
       max-width: 900px;
-      margin: 1em auto;
+      margin: 0 auto;
     }
     th, td {
       font-size: 0.9em;
@@ -36,40 +34,35 @@
     .controls label {
       margin: 0 1em;
     }
-  </style>
+</style>
 </head>
 <body>
   <h1>💧 Programme d’arrosage</h1>
-
-  <div class="controls">
+    <div class="controls">
     <strong>Programme :</strong>
-    <label><input type="radio" name="terrain" value="A" checked> A</label>
+    <label><input type="radio" name="terrain" value="Tout" checked> Tout</label>
+    <label><input type="radio" name="terrain" value="A"> A</label>
     <label><input type="radio" name="terrain" value="B"> B</label>
     <label><input type="radio" name="terrain" value="C"> C</label>
     <label><input type="radio" name="terrain" value="D"> D</label>
     <label><input type="radio" name="terrain" value="Hippodrome"> Hippodrome</label>
-    <label><input type="radio" name="terrain" value="Tout"> Tout</label>
   </div>
-
   <table>
-    <thead>
-      <tr>
-        <th>📅<br>Date</th>
-        <th>🌡️<br>Min/Max</th>
-        <th>🔆<br>ETP</th>
-        <th>🌧️<br>Pluie</th>
-        <th>💧<br>Besoin</th>
-        <th>📋<br>Programme</th>
-      </tr>
-    </thead>
-    <tbody id="contenu-tableau"></tbody>
+    <tr>
+      <th>📅<br>Date</th>
+      <th>🌡️<br>Min/Max</th>
+      <th>🔆<br>ETP</th>
+      <th>🌧️<br>Pluie</th>
+      <th>💧<br>Besoin estimé</th>
+      <th>🔁<br>Bonus</th>
+      <th>⏱️&💧<br>Programme</th>
+    </tr>
   </table>
-
   <p id="loading">Chargement des données météo...</p>
-
   <script>
     let derniereDate = null;
     let donneesPrecedentes = null;
+
     const programmes = {
       A: { surface: 7300, volume: 9, duree: 24 },
       B: { surface: 8300, volume: 9, duree: 25 },
@@ -78,10 +71,10 @@
       Hippodrome: { surface: 13000, volume: 16, duree: 40 },
       Tout: { surface: 46900, volume: 54, duree: 136 } // soit 2h16
     };
-
-    function getProgrammeActif() {
-      return document.querySelector('input[name="terrain"]:checked').value;
-    }
+    
+    const surface = 7500;
+    const volumeParCycle = 9;
+    const dureeParCycle = 24;
 
     async function afficherProgramme() {
       const url = "https://api.open-meteo.com/v1/forecast?latitude=49.8942&longitude=2.2633&daily=temperature_2m_max,temperature_2m_min,et0_fao_evapotranspiration,precipitation_sum&timezone=Europe%2FParis&altitude=22&forecast_days=16";
@@ -90,10 +83,17 @@
 
       const nouvelleDate = data.daily?.time?.[0];
       if (nouvelleDate === derniereDate) {
-        console.log("⏳ Données non mises à jour");
-        return;
+        console.log("⏳ Données non mises à jour, attente...");
+      return;
       }
       derniereDate = nouvelleDate;
+  
+      // ⬇️ ton code existant ici pour actualiser le tableau ⬇️
+      
+      if (!data.daily || !data.daily.time) {
+        console.error("Erreur dans la réponse API :", data);
+        return;
+      }
 
       const jours = data.daily.time;
       const tMax = data.daily.temperature_2m_max;
@@ -101,37 +101,73 @@
       const etp = data.daily.et0_fao_evapotranspiration;
       const pluie = data.daily.precipitation_sum;
 
-      const tbody = document.getElementById("contenu-tableau");
-      tbody.innerHTML = "";
-
-      const terrain = getProgrammeActif();
-      const { surface, volume, duree } = programmes[terrain];
-
+      // ✅ Vérifie que les données sont bien structurées avant d’avancer
+      if (!data.daily || !data.daily.time) {
+        console.error("Erreur dans la réponse API :", data);
+        return;
+      }
+      const table = document.querySelector("table");
+      table.innerHTML = `
+        <tr>
+          <th>📅<br>Date</th>
+          <th>🌡️<br>Min/Max</th>
+          <th>🔆<br>ETP</th>
+          <th>🌧️<br>Pluie</th>
+          <th>💧<br>Besoin</th>
+          <th>⏱️&💧<br>Programme</th>
+        </tr>
+      `;
       for (let i = 0; i < jours.length; i++) {
-        const dateObj = new Date(jours[i]);
-        const date = dateObj.toLocaleDateString("fr-FR", { weekday: 'short', day: 'numeric', month: 'short' });
-        const jourSemaine = dateObj.getDay();
-        const isWeekend = jourSemaine === 0 || jourSemaine === 6;
-
-        const tmin = tMin[i];
+        const date = new Date(jours[i]).toLocaleDateString("fr-FR", { weekday: 'short', day: 'numeric', month: 'short' });
         const tmax = tMax[i];
+        const tmin = tMin[i];
         const etpJour = etp[i];
         const pluieJour = pluie[i];
-        const besoinNet = Math.max(0, etpJour - pluieJour);
-        const cycles = Math.min(6, Math.ceil((besoinNet * surface) / (volume * 1000)));
-        const bonusPourcent = cycles * 100;
+        const besoinNet = Math.max(0, (etpJour - pluieJour)); // en mm
+        const besoin = (besoinNet * surface) / 1000; // en m³
+        const cycles = Math.min(6, Math.ceil(besoin / volumeParCycle));
+        const volumeTotal = cycles * volumeParCycle;
+        const temps = cycles * dureeParCycle;
+  
+        // pour le programme tout
+        const volume6Terrains = volumeTotal * 6;
+        const temps6Terrains = temps * 5.66;
+        const heures6T = Math.floor(temps6Terrains / 60);
+        const minutes6T = Math.round(temps6Terrains % 60);
+        const pluieColor = pluieJour > 0 ? 'color:blue;font-weight:bold;' : '';
+        const couleurTmin = tmin > 30 ? 'color:red;font-weight:bold;' : '';
+        const couleurTmax = tmax > 30 ? 'color:red;font-weight:bold;' : '';
+        const couleurETP = etpJour > 6 ? 'color:red;font-weight:bold;' : '';
+        // couleur pour le WE
+        const jourDate = new Date(jours[i]);
+        const jourSemaine = jourDate.getDay(); // 0 = dimanche, 6 = samedi
+        const isWeekend = jourSemaine === 0 || jourSemaine === 6;
+        // couleur si changement à l'actualisation des données
+        let changementTmin = '', changementTmax = '', changementETP = '', changementPluie = '';
+        if (donneesPrecedentes) {
+          if (tmin.toFixed(1) !== donneesPrecedentes.tmin[i].toFixed(1)) changementTmin = 'background-color:#ffd862;';
+          if (tmax.toFixed(1) !== donneesPrecedentes.tmax[i].toFixed(1)) changementTmax = 'background-color:#ffd862;';
+          if (etpJour.toFixed(1) !== donneesPrecedentes.etp[i].toFixed(1)) changementETP = 'background-color:#ffd862;';
+          if (pluieJour.toFixed(1) !== donneesPrecedentes.pluie[i].toFixed(1)) changementPluie = 'background-color:#ffd862;';
+        }
 
+        // fusionne les styles
+        const styleTmin = [changementTmin, couleurTmin].filter(Boolean).join('');
+        const styleTmax = [changementTmax, couleurTmax].filter(Boolean).join('');
+        const styleETP = [changementETP, couleurETP].filter(Boolean).join('');
+        const stylePluie = [changementPluie, pluieColor].filter(Boolean).join('');
+  
         const volumeApplique = (volume * cycles);
         const dureeApplique = duree * cycles;
         const apportMM = (volumeApplique / surface) * 1000;
-
+        
         const ligne = `
-          <tr class="${isWeekend ? 'weekend' : ''}">
-            <td>${date}</td>
-            <td>${tmin.toFixed(1)}°C<br>${tmax.toFixed(1)}°C</td>
-            <td>${etpJour.toFixed(1)}mm</td>
-            <td>${pluieJour.toFixed(1)}mm</td>
-            <td>${besoinNet.toFixed(1)}mm<br>${bonusPourcent}%</td>
+          <tr>
+            <td class="${isWeekend ? 'weekend' : ''}">${date}</td>
+            <td><span style="${styleTmin}">${tmin.toFixed(1)}°C</span><br><span style="${styleTmax}">${tmax.toFixed(1)}°C</span></td>
+            <td style="${styleETP}">${etpJour.toFixed(1)}mm</td>
+            <td style="${stylePluie}">${pluieJour.toFixed(1)}mm</td>
+            <td>${besoinNet.toFixed(1)}mm<br>${cycles * 100}%</td>
             <td>
               Temps : ${Math.floor(dureeApplique / 60)}h${Math.round(dureeApplique % 60)}min<br>
               Volume : ${volumeApplique.toFixed(1)} m³<br>
@@ -140,25 +176,24 @@
             </td>
           </tr>
         `;
-        tbody.insertAdjacentHTML("beforeend", ligne);
+        table.insertAdjacentHTML("beforeend", ligne);
       }
-
+      // ✅ Masquer le message de chargement une fois les données affichées
       document.getElementById("loading").style.display = "none";
       donneesPrecedentes = {
-        tmin: [...tMin],
-        tmax: [...tMax],
-        etp: [...etp],
-        pluie: [...pluie]
+      tmin: [...tMin],
+      tmax: [...tMax],
+      etp: [...etp],
+      pluie: [...pluie]
       };
     }
 
+    afficherProgramme();
+    // ⏱️ Rafraîchir automatiquement toutes les 3 heures (3 × 60 × 60 × 1000 ms)
+    setInterval(afficherProgramme, 10 * 60 * 1000);
     // Recalculer à chaque sélection de programme
     document.querySelectorAll('input[name="terrain"]').forEach(radio => {
-      radio.addEventListener("change", afficherProgramme);
-    });
-
-    afficherProgramme();
-    setInterval(afficherProgramme, 10 * 60 * 1000);
+    radio.addEventListener("change", afficherProgramme);
   </script>
 </body>
 </html>

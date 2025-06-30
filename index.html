@@ -129,7 +129,6 @@ let ancienBesoinNet = 0;
 if (donneesPrecedentes && donneesPrecedentes.etp && donneesPrecedentes.pluie) {
   ancienBesoinNet = Math.max(0, donneesPrecedentes.etp[i] - donneesPrecedentes.pluie[i]);
 }
-        const ancienBesoinNet = Math.max(0, donneesPrecedentes.etp[i] - donneesPrecedentes.pluie[i]);
         const fondBesoin = donneesPrecedentes ? styleVariation(besoinNet, ancienBesoinNet) : '';
         function calculerBonusPerso(besoinNet) {
           const coeff = besoinNet / 1.2;

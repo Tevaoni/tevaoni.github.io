@@ -30,7 +30,7 @@
         <th>Pluie</th>
         <th>Besoin d’arrosage</th>
         <th>Arrosage > 80% Besoin</th>
-        <th>Rafale</th>
+        <th>Vent/Rafale</th>
         <th>Probalité qu'il pleuve</th>
       </tr>
     </thead>
@@ -38,7 +38,7 @@
   </table>
 
   <script>
-    const API_URL = "https://api.open-meteo.com/v1/forecast?latitude=49.8942&longitude=2.2633&daily=wind_gusts_10m,precipitation_probability_max,temperature_2m_max,temperature_2m_min,et0_fao_evapotranspiration,precipitation_sum&timezone=Europe%2FParis&altitude=22&forecast_days=16";
+    const API_URL = "https://api.open-meteo.com/v1/forecast?latitude=49.8942&longitude=2.2633&daily=wind_speed_10m_max,wind_gusts_10m_max,precipitation_probability_max,temperature_2m_max,temperature_2m_min,et0_fao_evapotranspiration,precipitation_sum&timezone=Europe%2FParis&altitude=22&forecast_days=16";
     function getDayName(dateStr) {
       return new Date(dateStr).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' });
     }
@@ -67,7 +67,8 @@
       tbody.innerHTML = '';
       const n = meteo.time.length;
       for(let i=0; i<n; ++i) {
-        const ventMax = wind_gusts_10m[i];
+        const vent = wind_speed_10m_max[i];
+        const ventMax = wind_gusts_10m_max[i];
         const pluieProbable = precipitation_probability_max[i];
         const date = meteo.time[i];
         const tmin = meteo.temperature_2m_min[i];
@@ -92,7 +93,7 @@
             <td class="${colorPluie(pluie)}">${pluie.toFixed(1)}</td>
             <td>${besoin == 0 ? '🚫' : besoin.toFixed(1)}</td>
             <td>${arrosage}</td>
-            <td>${ventMax.toFixed(1)}</td>
+            <td>${vent.toFixed(1)}/${ventMax.toFixed(1)}</td>
             <td>${pluieProbable.toFixed(1)}</td>
           </tr>
         `;

@@ -61,6 +61,53 @@
     function colorPluie(val) {
       return val > 1 ? 'rain' : '';
     }
+    // les jours fériés
+    function getEaster(year) {
+      // Calcul de la date de Pâques (algorithme de Gauss)
+      var f = Math.floor,
+          G = year % 19,
+          C = f(year / 100),
+          H = (C - f(C / 4) - f((8*C + 13) / 25) + 19*G + 15) % 30,
+          I = H - f(H / 28) * (1 - f(H / 28) * f(29 / (H + 1)) * f((21 - G) / 11)),
+          J = (year + f(year / 4) + I + 2 - C + f(C / 4)) % 7,
+          L = I - J,
+          month = 3 + f((L + 40) / 44),
+          day = L + 28 - 31 * f(month / 4);
+      return new Date(year, month - 1, day);
+    }
+    function joursFeriesFrance(year) {
+      // Jours fixes
+      const feries = [
+        new Date(year, 0, 1),    // 1 Janvier
+        new Date(year, 4, 1),    // 1 Mai
+        new Date(year, 4, 8),    // 8 Mai
+        new Date(year, 6, 14),   // 14 Juillet
+        new Date(year, 7, 15),   // 15 Août
+        new Date(year, 10, 1),   // 1 Novembre
+        new Date(year, 10, 11),  // 11 Novembre
+        new Date(year, 11, 25)   // 25 Décembre
+      ];
+      // Jours mobiles
+      const paques = getEaster(year);
+      const lundiPaques = new Date(paques); lundiPaques.setDate(paques.getDate() + 1);
+      const ascension = new Date(paques); ascension.setDate(paques.getDate() + 39);
+      const pentecote = new Date(paques); pentecote.setDate(paques.getDate() + 50);
+      const lundiPentecote = new Date(paques); lundiPentecote.setDate(paques.getDate() + 51);
+      feries.push(
+        lundiPaques,    // Lundi de Pâques
+        ascension,      // Ascension
+        pentecote,      // Pentecôte (dimanche)
+        lundiPentecote  // Lundi de Pentecôte
+      );
+      return feries.map(d => d.toISOString().slice(0,10)); // format 'YYYY-MM-DD'
+    }
+    // Fonction de test
+    function estFerie(date) {
+      const year = date.getFullYear();
+      const feries = joursFeriesFrance(year);
+      const dISO = date.toISOString().slice(0,10); // 'YYYY-MM-DD'
+      return feries.includes(dISO);
+    }
 
     function afficherTableau(meteo) {
       const tbody = document.getElementById('table-contenu');
@@ -80,15 +127,16 @@
         const seuil = besoin * 0.8 / 1.2;
         const arrondi = Math.ceil(seuil) * 100;
         const arrosage = besoin == 0 ? '🚫' : `${arrondi}%`;
+        const symboleFete = estFerie(date) ? " 🎉" : "";
 
         tbody.innerHTML += `
           <tr>
-            <td class="${weekend}">${getDayName(date)}</td>
+            <td class="${weekend}">${getDayName(date)}${symboleFete}</td>
             <td>
               <span class="${colorTemp(tmin)}">${tmin.toFixed(1)}°C</span> | <span class="${colorTemp(tmax)}">${tmax.toFixed(1)}°C</span>
             </td>
-            <td ${(vent > 60 || ventMax > 80) ? ' style="color:red;font-weight:bold;"' : ''}>${vent}km/h | ${ventMax}km/h</td>
-            <td ${(pluieProbable > 55) ? ' style="color:bleu;font-weight:bold;"' : ''}>${pluieProbable}%</td>
+            <td ${(vent > 60 || ventMax > 80) ? ' style="color:red;font-weight:bold;"' : (vent > 40 || ventMax > 60) ? ' style="color:orange;font-weight:bold;"' : ''}>${vent}km/h | ${ventMax}km/h</td>
+            <td ${(pluieProbable > 55) ? ' style="color:blue;font-weight:bold;"' : ''}>${pluieProbable}%</td>
             <td class="${colorPluie(pluie)}">${pluie.toFixed(1)}</td>
             <td class="${colorETP(etp)}">${etp.toFixed(1)}</td>
             <td>${besoin == 0 ? '🚫' : besoin.toFixed(1)}</td>

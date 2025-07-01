@@ -109,7 +109,6 @@
       return feries.includes(dISO);
     }
 
-        const symboleFete = estFerie(date) ? " 🎉" : "";
     function afficherTableau(meteo) {
       const tbody = document.getElementById('table-contenu');
       tbody.innerHTML = '';
@@ -129,6 +128,12 @@
         const arrondi = Math.ceil(seuil) * 100;
         const arrosage = besoin == 0 ? '🚫' : `${arrondi}%`;
 
+        const d = new Date(date);
+        let symboleFete = "";
+        if (estFerie(d)) {
+          symboleFete = " 🎉";
+        }
+        
         tbody.innerHTML += `
           <tr>
             <td class="${weekend}">${getDayName(date)}${symboleFete}</td>

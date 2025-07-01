@@ -72,11 +72,11 @@
         const pluie = meteo.precipitation_sum[i];
         const weekend = isWeekend(date) ? 'weekend' : '';
         const besoin = Math.max(0, etp - pluie);
-        const arrosage = besoin === 0 ? '🚫' : `${Math.floor(besoin / 1.2) * 100}%`;
+        const arrosage = besoin == 0 ? '🚫' : `${Math.floor(besoin / 1.2) * 100}%`;
 
         tbody.innerHTML += `
-          <tr class="${weekend}">
-            <td>${getDayName(date)}</td>
+          <tr>
+            <td class="${weekend}">${getDayName(date)}</td>
             <td>
               <span class="${colorTemp(tmin)}">${tmin.toFixed(1)}°C</span>
               /
@@ -84,7 +84,7 @@
             </td>
             <td class="${colorETP(etp)}">${etp.toFixed(1)}</td>
             <td class="${colorPluie(pluie)}">${pluie.toFixed(1)}</td>
-            <td>${besoin === 0 ? '🚫' : besoin.toFixed(1)}</td>
+            <td>${besoin == 0 ? '🚫' : besoin.toFixed(1)}</td>
             <td>${arrosage}</td>
           </tr>
         `;

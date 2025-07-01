@@ -49,6 +49,7 @@
 
     function colorTemp(val) {
       if(val < 0) return 'blue';
+      if(val > 26) return 'orange';
       if(val > 30) return 'red';
       return '';
     }

@@ -32,53 +32,31 @@
     <tbody id="contenu-tableau"></tbody>
   </table>
   <script>
-    const programmes = {
-      A: { surface: 7300, volume: 9, duree: 24 },
-      B: { surface: 8300, volume: 9, duree: 25 },
-      C: { surface: 8400, volume: 9, duree: 25 },
-      D: { surface: 10000, volume: 11, duree: 24 },
-      Hippodrome: { surface: 13000, volume: 16, duree: 40 },
-      Tout: { surface: 46900, volume: 54, duree: 136 }
-    };
+
+    //  Tout: { surface: 46900, volume: 54, duree: 136 }
+    
         const besoinNet = Math.max(0, etpJour - pluieJour);
 
 
         const bonus = calculerBonusPerso(besoinNet);
         const aucunBesoin = bonus === 0;
+const coeff = besoinNet / 1.2;
 
-let ancienBesoinNet = 0;
-let fondBesoin = '';
-    
-    function styleVariation(valActuelle, valPrecedente, seuil = 0.1) {
-      return Math.abs(valActuelle - valPrecedente) > seuil
-      ? 'background-color:#ffd862;' 
-      : '';
-    }
-    
+
+ 
     function calculerBonusPerso(besoinNet) {
-      const coeff = besoinNet / 1.2;
       if (coeff > 0 && coeff < 1) {
         return coeff > 0.4 ? 100 : 0;
       }
       return Math.floor(coeff) * 100;
     }
     
-
-
-
-    function afficherColonneProgrammeActive() {
-      const terrain = document.querySelector('input[name="terrain"]:checked').value;
-      document.querySelectorAll('[class^="programme-cellule-"]').forEach(c => c.style.display = "none");
-      document.querySelectorAll('.programme-cellule-' + terrain).forEach(c => c.style.display = "table-cell");
-    }
-
     async function chargerMeteo() {
         const url = "https://api.open-meteo.com/v1/forecast?latitude=49.8942&longitude=2.2633&daily=temperature_2m_max,temperature_2m_min,et0_fao_evapotranspiration,precipitation_sum&timezone=Europe%2FParis&altitude=22&forecast_days=16";
         const res = await fetch(url);
         const data = await res.json();
         meteo = data.daily;
         afficherProgramme();
-
     }
     
     function afficherProgramme() {
@@ -102,11 +80,11 @@ let fondBesoin = '';
             </td>
             <td style="${etpJour > 6 ? 'color:red;font-weight:bold;' : ''}">${etpJour.toFixed(1)}mm</td>
             <td style="${pluieJour > 1 ? 'color:blue;font-weight:bold;' : ''}">${pluieJour.toFixed(1)}mm</td>
-            <td style="${fondBesoin}">
-              ${aucunBesoin ? '🚫' : `${bonus}%
+            <td>
+              ${aucunBesoin ? '🚫' : `${bonus}%` }
             </td>
-            <td style="${fondBesoin}">
-              ${besoinNet.toFixed(1)}mm`}
+            <td>
+              ${besoinNet.toFixed(1)}mm
             </td>
             
           </tr>

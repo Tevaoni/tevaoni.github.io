@@ -16,7 +16,6 @@
     .weekend { background-color: #804A80 !important; color: #fff; }
     .blue { color: #0070f3; font-weight: bold; }
     .red { color: #ff3b3b; font-weight: bold; }
-    .rain { color: #2299ee; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -56,10 +55,6 @@
 
     function colorETP(val) {
       return val > 6 ? 'red' : '';
-    }
-
-    function colorPluie(val) {
-      return val > 1 ? 'rain' : '';
     }
     // les jours fériés
     function getEaster(year) {
@@ -144,7 +139,7 @@
             </td>
             <td ${(vent > 60 || ventMax > 80) ? ' style="color:red;font-weight:bold;"' : (vent > 40 || ventMax > 55) ? ' style="color:orange;font-weight:bold;"' : ''}>${vent}km/h | ${ventMax}km/h</td>
             <td ${(pluieProbable > 55) ? ' style="color:blue;font-weight:bold;"' : ''}>${pluieProbable}%</td>
-            <td class="${colorPluie(pluie)}">${pluie.toFixed(1)}</td>
+            <td  ${(pluie > 1) ? ' style="color:blue;font-weight:bold;"' : ''}>${pluie.toFixed(1)}</td>
             <td class="${colorETP(etp)}">${etp.toFixed(1)}</td>
             <td>${besoin == 0 ? '🚫' : besoin.toFixed(1)}</td>
             <td>${arrosage}</td>

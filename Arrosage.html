@@ -67,9 +67,9 @@
       tbody.innerHTML = '';
       const n = meteo.time.length;
       for(let i=0; i<n; ++i) {
-        const vent = wind_speed_10m_max[i];
-        const ventMax = wind_gusts_10m_max[i];
-        const pluieProbable = precipitation_probability_max[i];
+        const vent = meteo.wind_speed_10m_max[i];
+        const ventMax = meteo.wind_gusts_10m_max[i];
+        const pluieProbable = meteo.precipitation_probability_max[i];
         const date = meteo.time[i];
         const tmin = meteo.temperature_2m_min[i];
         const tmax = meteo.temperature_2m_max[i];

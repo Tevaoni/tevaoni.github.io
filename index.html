@@ -7,28 +7,17 @@
     body { text-align: center; }
     h1 { color: #22aa77; }
     table {
-      border-collapse: collapse;
       width: 100%;
       max-width: 1100px;
       margin: 0 auto;
     }
-    th, td {
-      border: 1px solid #22aa77;
-    }
+    th, td { border: 1px solid #22aa77; }
     th { background: #66cc99; }
     .weekend { background-color: #804A80; }
-    .controls {
-      margin-top: 1em;
-      font-size: 0.95em;
-    }
-    .controls label {
-      margin: 0 1em;
-    }
   </style>
 </head>
 <body>
   <h1>💧 Programme d’arrosage</h1>
-
   <table>
     <thead>
       <tr>
@@ -37,17 +26,12 @@
         <th>🔆<br>ETP</th>
         <th>🌧️<br>Pluie</th>
         <th>💧<br>Besoin</th>
-        <th>🧮<br>Programme</th>
+        <th>🧮<br>Arrosage</th>
       </tr>
     </thead>
     <tbody id="contenu-tableau"></tbody>
   </table>
-
-  <p id="loading">Chargement des données météo...</p>
-
   <script>
-    let donneesPrecedentes = null;
-    let meteo = null;
     const programmes = {
       A: { surface: 7300, volume: 9, duree: 24 },
       B: { surface: 8300, volume: 9, duree: 25 },
@@ -89,46 +73,25 @@ let fondBesoin = '';
     }
 
     async function chargerMeteo() {
-      try {
         const url = "https://api.open-meteo.com/v1/forecast?latitude=49.8942&longitude=2.2633&daily=temperature_2m_max,temperature_2m_min,et0_fao_evapotranspiration,precipitation_sum&timezone=Europe%2FParis&altitude=22&forecast_days=16";
         const res = await fetch(url);
         const data = await res.json();
-        if (!data || !data.daily || !data.daily.time) {
-          throw new Error("Données météo incomplètes.");
-        }
         meteo = data.daily;
         afficherProgramme();
-      } catch (err) {
-        document.getElementById("loading").textContent = "Erreur de chargement météo.";
-        console.error("❌ Erreur météo :", err);
-      }
+
     }
     
     function afficherProgramme() {
-      if (!meteo) return;
       const jours = meteo.time, tMax = meteo.temperature_2m_max, tMin = meteo.temperature_2m_min, etp = meteo.et0_fao_evapotranspiration, pluie = meteo.precipitation_sum;
       const tbody = document.getElementById("contenu-tableau");
       tbody.innerHTML = "";
-
-      
+    
       for (let i = 0; i < jours.length; i++) {
         const dateObj = new Date(jours[i]);
         const isWeekend = [0,6].includes(dateObj.getDay());
         const date = dateObj.toLocaleDateString("fr-FR", { weekday: 'short', day: 'numeric', month: 'short' });
         const tmin = tMin[i], tmax = tMax[i], etpJour = etp[i], pluieJour = pluie[i];
-        
-        if (etpJour == null || pluieJour == null || tmin == null || tmax == null) {
-          console.warn(`⚠️ Données météo manquantes pour le jour ${i}`);
-          continue; // saute ce jour
-        }
-        
 
-if (donneesPrecedentes && donneesPrecedentes.etp && donneesPrecedentes.pluie) {
-  ancienBesoinNet = Math.max(0, donneesPrecedentes.etp[i] - donneesPrecedentes.pluie[i]);
-  fondBesoin = styleVariation(besoinNet, ancienBesoinNet);
-}
-
-        
         const ligne = `
           <tr>
             <td class="${isWeekend ? 'weekend' : ''}">${date}</td>
@@ -150,18 +113,10 @@ if (donneesPrecedentes && donneesPrecedentes.etp && donneesPrecedentes.pluie) {
         `;
         tbody.insertAdjacentHTML("beforeend", ligne);
       }
-
-      document.getElementById("loading").style.display = "none";
-      donneesPrecedentes = {
-        tmin: [...tMin],
-        tmax: [...tMax],
-        etp: [...etp],
-        pluie: [...pluie]
-      };
     }
 
-    chargerMeteo();
-    setInterval(chargerMeteo, 30 * 60 * 1000);
+    // chargerMeteo();
+    // setInterval(chargerMeteo, 30 * 60 * 1000);
   </script>
 </body>
 </html>

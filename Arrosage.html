@@ -26,12 +26,12 @@
       <tr>
         <th>Date</th>
         <th>Temp. Min/Max</th>
-        <th>ETP</th>
-        <th>Pluie</th>
-        <th>Besoin d’arrosage</th>
-        <th>Arrosage > 80% Besoin</th>
         <th>Vent/Rafale</th>
         <th>Probalité qu'il pleuve</th>
+        <th>Pluie</th>
+        <th>ETP</th>
+        <th>Besoin d’arrosage</th>
+        <th>Arrosage > 80% Besoin</th>
       </tr>
     </thead>
     <tbody id="table-contenu"></tbody>
@@ -85,16 +85,14 @@
           <tr>
             <td class="${weekend}">${getDayName(date)}</td>
             <td>
-              <span class="${colorTemp(tmin)}">${tmin.toFixed(1)}°C</span>
-              /
-              <span class="${colorTemp(tmax)}">${tmax.toFixed(1)}°C</span>
+              <span class="${colorTemp(tmin)}">${tmin.toFixed(1)}°C</span>/<span class="${colorTemp(tmax)}">${tmax.toFixed(1)}°C</span>
             </td>
-            <td class="${colorETP(etp)}">${etp.toFixed(1)}</td>
+            <td>${vent}km/h / ${ventMax}km/h</td>
+            <td>${pluieProbable}%</td>
             <td class="${colorPluie(pluie)}">${pluie.toFixed(1)}</td>
+            <td class="${colorETP(etp)}">${etp.toFixed(1)}</td>
             <td>${besoin == 0 ? '🚫' : besoin.toFixed(1)}</td>
             <td>${arrosage}</td>
-            <td>${vent} / ${ventMax} km/h</td>
-            <td>${pluieProbable}%</td>
           </tr>
         `;
       }

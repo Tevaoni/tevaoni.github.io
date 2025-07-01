@@ -72,7 +72,9 @@
         const pluie = meteo.precipitation_sum[i];
         const weekend = isWeekend(date) ? 'weekend' : '';
         const besoin = Math.max(0, etp - pluie);
-        const arrosage = besoin == 0 ? '🚫' : `${Math.floor(besoin / 1.2) * 100}%`;
+        const seuil = besoin * 0.8 / 1.2;
+        const arrondi = Math.ceil(seuil / 100) * 100;
+        const arrosage = besoin == 0 ? '🚫' : `${arrondi}%`;
 
         tbody.innerHTML += `
           <tr>

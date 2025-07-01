@@ -35,12 +35,7 @@
 
     //  Tout: { surface: 46900, volume: 54, duree: 136 }
     
-        const besoinNet = Math.max(0, etpJour - pluieJour);
 
-
-        const bonus = calculerBonusPerso(besoinNet);
-        const aucunBesoin = bonus === 0;
-const coeff = besoinNet / 1.2;
 
 
  
@@ -69,7 +64,12 @@ const coeff = besoinNet / 1.2;
         const isWeekend = [0,6].includes(dateObj.getDay());
         const date = dateObj.toLocaleDateString("fr-FR", { weekday: 'short', day: 'numeric', month: 'short' });
         const tmin = tMin[i], tmax = tMax[i], etpJour = etp[i], pluieJour = pluie[i];
+        const besoinNet = Math.max(0, etpJour - pluieJour);
 
+
+        const bonus = calculerBonusPerso(besoinNet);
+        const aucunBesoin = bonus === 0;
+        const coeff = besoinNet / 1.2;
         const ligne = `
           <tr>
             <td class="${isWeekend ? 'weekend' : ''}">${date}</td>

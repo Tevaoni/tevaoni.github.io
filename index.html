@@ -29,16 +29,6 @@
 <body>
   <h1>💧 Programme d’arrosage</h1>
 
-  <div class="controls">
-    <strong>Programme :</strong>
-    <label><input type="radio" name="terrain" value="Tout" checked> Tout</label>
-    <label><input type="radio" name="terrain" value="A"> A</label>
-    <label><input type="radio" name="terrain" value="B"> B</label>
-    <label><input type="radio" name="terrain" value="C"> C</label>
-    <label><input type="radio" name="terrain" value="D"> D</label>
-    <label><input type="radio" name="terrain" value="Hippodrome"> Hippodrome</label>
-  </div>
-
   <table>
     <thead>
       <tr>
@@ -56,11 +46,8 @@
   <p id="loading">Chargement des données météo...</p>
 
   <script>
-    function styleVariation(valActuelle, valPrecedente, seuil = 0.1) {
-      return Math.abs(valActuelle - valPrecedente) > seuil
-      ? 'background-color:#ffd862;' 
-      : '';
-    }
+    let donneesPrecedentes = null;
+    let meteo = null;
     const programmes = {
       A: { surface: 7300, volume: 9, duree: 24 },
       B: { surface: 8300, volume: 9, duree: 25 },
@@ -69,9 +56,31 @@
       Hippodrome: { surface: 13000, volume: 16, duree: 40 },
       Tout: { surface: 46900, volume: 54, duree: 136 }
     };
+        const besoinNet = Math.max(0, etpJour - pluieJour);
 
-    let donneesPrecedentes = null;
-    let meteo = null;
+
+        const bonus = calculerBonusPerso(besoinNet);
+        const aucunBesoin = bonus === 0;
+
+let ancienBesoinNet = 0;
+let fondBesoin = '';
+    
+    function styleVariation(valActuelle, valPrecedente, seuil = 0.1) {
+      return Math.abs(valActuelle - valPrecedente) > seuil
+      ? 'background-color:#ffd862;' 
+      : '';
+    }
+    
+    function calculerBonusPerso(besoinNet) {
+      const coeff = besoinNet / 1.2;
+      if (coeff > 0 && coeff < 1) {
+        return coeff > 0.4 ? 100 : 0;
+      }
+      return Math.floor(coeff) * 100;
+    }
+    
+
+
 
     function afficherColonneProgrammeActive() {
       const terrain = document.querySelector('input[name="terrain"]:checked').value;
@@ -113,41 +122,12 @@
           continue; // saute ce jour
         }
         
-        const besoinNet = Math.max(0, etpJour - pluieJour);
-
-
-        const bonus = calculerBonusPerso(besoinNet);
-        const aucunBesoin = bonus === 0;
-        const colonnesProgramme = Object.entries(programmes).map(([nom, p]) => {
-          if (aucunBesoin) {
-              return `<td class="programme-cellule-${nom}" style="display:none;">🚫<br>Aucun arrosage</td>`;
-          }
-          const besoin = (besoinNet * p.surface) / 1000;
-          const cycles = Math.min(6, Math.ceil(besoin / p.volume));
-          const volume = cycles * p.volume;
-          const duree = cycles * p.duree;
-          const apport = (volume / p.surface) * 1000;
-          return `<td class="programme-cellule-${nom}" style="display:none;">
-            Temps : ${Math.floor(duree/60)}h${Math.round(duree%60)}min<br>
-            Volume : ${volume.toFixed(1)} m³<br>
-            Surface : ${p.surface.toLocaleString()} m²<br>
-            Apport : ${apport.toFixed(1)} mm
-          </td>`;
-        }).join('');
-let ancienBesoinNet = 0;
-let fondBesoin = '';
 
 if (donneesPrecedentes && donneesPrecedentes.etp && donneesPrecedentes.pluie) {
   ancienBesoinNet = Math.max(0, donneesPrecedentes.etp[i] - donneesPrecedentes.pluie[i]);
   fondBesoin = styleVariation(besoinNet, ancienBesoinNet);
 }
-            function calculerBonusPerso(besoinNet) {
-      const coeff = besoinNet / 1.2;
-      if (coeff > 0 && coeff < 1) {
-        return coeff > 0.4 ? 100 : 0;
-      }
-      return Math.floor(coeff) * 100;
-    }
+
         
         const ligne = `
           <tr>
@@ -161,10 +141,11 @@ if (donneesPrecedentes && donneesPrecedentes.etp && donneesPrecedentes.pluie) {
             <td style="${pluieJour > 1 ? 'color:blue;font-weight:bold;' : ''}">${pluieJour.toFixed(1)}mm</td>
             <td style="${fondBesoin}">
               ${aucunBesoin ? '🚫' : `${bonus}%
-              <br>
+            </td>
+            <td style="${fondBesoin}">
               ${besoinNet.toFixed(1)}mm`}
             </td>
-            ${colonnesProgramme}
+            
           </tr>
         `;
         tbody.insertAdjacentHTML("beforeend", ligne);
@@ -177,15 +158,10 @@ if (donneesPrecedentes && donneesPrecedentes.etp && donneesPrecedentes.pluie) {
         etp: [...etp],
         pluie: [...pluie]
       };
-      afficherColonneProgrammeActive();
     }
 
-    document.querySelectorAll('input[name="terrain"]').forEach(radio => {
-      radio.addEventListener("change", afficherColonneProgrammeActive);
-    });
-
     chargerMeteo();
-    setInterval(chargerMeteo, 10 * 60 * 1000);
+    setInterval(chargerMeteo, 30 * 60 * 1000);
   </script>
 </body>
 </html>

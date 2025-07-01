@@ -67,9 +67,9 @@
       tbody.innerHTML = '';
       const n = meteo.time.length;
       for(let i=0; i<n; ++i) {
-        const vent = meteo.wind_speed_10m_max[i];
-        const ventMax = meteo.wind_gusts_10m_max[i];
-        const pluieProbable = meteo.precipitation_probability_max[i];
+        const vent = Math.round(meteo.wind_speed_10m_max[i]);
+        const ventMax = Math.round(meteo.wind_gusts_10m_max[i]);
+        const pluieProbable = Math.round(meteo.precipitation_probability_max[i]);
         const date = meteo.time[i];
         const tmin = meteo.temperature_2m_min[i];
         const tmax = meteo.temperature_2m_max[i];
@@ -93,8 +93,8 @@
             <td class="${colorPluie(pluie)}">${pluie.toFixed(1)}</td>
             <td>${besoin == 0 ? '🚫' : besoin.toFixed(1)}</td>
             <td>${arrosage}</td>
-            <td>${vent.toFixed(1)}/${ventMax.toFixed(1)}</td>
-            <td>${pluieProbable.toFixed(1)}</td>
+            <td>${vent.toFixed(1)} / ${ventMax.toFixed(1)} km/h</td>
+            <td>${pluieProbable.toFixed(1)}%</td>
           </tr>
         `;
       }

@@ -1,1 +1,109 @@
-<a href="Arrosage.html">Arrosage</a>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Arrosage – Tableau Simple</title>
+  <style>
+    body { text-align: center; }
+    h1 { color: #22aa77; margin-bottom: 20px; }
+    table {
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    th, td { border: 1px solid #22aa77; }
+    th { background: #66cc99; }
+    .weekend { background-color: #804A80 !important; color: #fff; }
+    .blue { color: #0070f3; font-weight: bold; }
+    .red { color: #ff3b3b; font-weight: bold; }
+    .rain { color: #2299ee; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>💧Programme d'arrosage</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Temp. Min/Max</th>
+        <th>Vent/Rafale</th>
+        <th>Probalité qu'il pleuve</th>
+        <th>Pluie</th>
+        <th>ETP</th>
+        <th>Besoin d’arrosage</th>
+        <th>Arrosage > 80% Besoin</th>
+      </tr>
+    </thead>
+    <tbody id="table-contenu"></tbody>
+  </table>
+
+  <script>
+    const API_URL = "https://api.open-meteo.com/v1/forecast?latitude=49.8942&longitude=2.2633&daily=wind_speed_10m_max,wind_gusts_10m_max,precipitation_probability_max,temperature_2m_max,temperature_2m_min,et0_fao_evapotranspiration,precipitation_sum&timezone=Europe%2FParis&altitude=22&forecast_days=16";
+    function getDayName(dateStr) {
+      return new Date(dateStr).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' });
+    }
+
+    function isWeekend(dateStr) {
+      const day = new Date(dateStr).getDay();
+      return day === 0 || day === 6;
+    }
+
+    function colorTemp(val) {
+      if(val < 0) return 'blue';
+      if(val > 30) return 'red';
+      return '';
+    }
+
+    function colorETP(val) {
+      return val > 6 ? 'red' : '';
+    }
+
+    function colorPluie(val) {
+      return val > 1 ? 'rain' : '';
+    }
+
+    function afficherTableau(meteo) {
+      const tbody = document.getElementById('table-contenu');
+      tbody.innerHTML = '';
+      const n = meteo.time.length;
+      for(let i=0; i<n; ++i) {
+        const vent = Math.round(meteo.wind_speed_10m_max[i]);
+        const ventMax = Math.round(meteo.wind_gusts_10m_max[i]);
+        const pluieProbable = Math.round(meteo.precipitation_probability_max[i]);
+        const date = meteo.time[i];
+        const tmin = meteo.temperature_2m_min[i];
+        const tmax = meteo.temperature_2m_max[i];
+        const etp = meteo.et0_fao_evapotranspiration[i];
+        const pluie = meteo.precipitation_sum[i];
+        const weekend = isWeekend(date) ? 'weekend' : '';
+        const besoin = Math.max(0, etp - pluie);
+        const seuil = besoin * 0.8 / 1.2;
+        const arrondi = Math.ceil(seuil) * 100;
+        const arrosage = besoin == 0 ? '🚫' : `${arrondi}%`;
+
+        tbody.innerHTML += `
+          <tr>
+            <td class="${weekend}">${getDayName(date)}</td>
+            <td>
+              <span class="${colorTemp(tmin)}">${tmin.toFixed(1)}°C</span>/<span class="${colorTemp(tmax)}">${tmax.toFixed(1)}°C</span>
+            </td>
+            <td>${vent}km/h / ${ventMax}km/h</td>
+            <td>${pluieProbable}%</td>
+            <td class="${colorPluie(pluie)}">${pluie.toFixed(1)}</td>
+            <td class="${colorETP(etp)}">${etp.toFixed(1)}</td>
+            <td>${besoin == 0 ? '🚫' : besoin.toFixed(1)}</td>
+            <td>${arrosage}</td>
+          </tr>
+        `;
+      }
+    }
+
+    fetch(API_URL)
+      .then(r => r.json())
+      .then(data => afficherTableau(data.daily))
+      .catch(() => {
+        document.getElementById('table-contenu').innerHTML = '<tr><td colspan="6">Erreur de chargement des données météo.</td></tr>';
+      });
+  </script>
+</body>
+</html>

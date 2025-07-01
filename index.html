@@ -109,6 +109,7 @@
       return feries.includes(dISO);
     }
 
+        const symboleFete = estFerie(date) ? " 🎉" : "";
     function afficherTableau(meteo) {
       const tbody = document.getElementById('table-contenu');
       tbody.innerHTML = '';
@@ -127,7 +128,6 @@
         const seuil = besoin * 0.8 / 1.2;
         const arrondi = Math.ceil(seuil) * 100;
         const arrosage = besoin == 0 ? '🚫' : `${arrondi}%`;
-        const symboleFete = estFerie(date) ? " 🎉" : "";
 
         tbody.innerHTML += `
           <tr>

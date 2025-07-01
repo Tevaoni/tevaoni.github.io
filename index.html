@@ -128,7 +128,9 @@
         const arrondi = Math.ceil(seuil) * 100;
         const arrosage = besoin == 0 ? '🚫' : `${arrondi}%`;
 
-        const d = new Date(date);
+        // const d = new Date(date);
+        const [year, month, day] = date.split('-');
+        const d = new Date(Number(year), Number(month) - 1, Number(day));
         let symboleFete = "";
         if (estFerie(d)) {
           symboleFete = " 🎉";
@@ -140,7 +142,7 @@
             <td>
               <span class="${colorTemp(tmin)}">${tmin.toFixed(1)}°C</span> | <span class="${colorTemp(tmax)}">${tmax.toFixed(1)}°C</span>
             </td>
-            <td ${(vent > 60 || ventMax > 80) ? ' style="color:red;font-weight:bold;"' : (vent > 40 || ventMax > 60) ? ' style="color:orange;font-weight:bold;"' : ''}>${vent}km/h | ${ventMax}km/h</td>
+            <td ${(vent > 60 || ventMax > 80) ? ' style="color:red;font-weight:bold;"' : (vent > 40 || ventMax > 55) ? ' style="color:orange;font-weight:bold;"' : ''}>${vent}km/h | ${ventMax}km/h</td>
             <td ${(pluieProbable > 55) ? ' style="color:blue;font-weight:bold;"' : ''}>${pluieProbable}%</td>
             <td class="${colorPluie(pluie)}">${pluie.toFixed(1)}</td>
             <td class="${colorETP(etp)}">${etp.toFixed(1)}</td>

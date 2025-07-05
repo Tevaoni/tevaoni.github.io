@@ -119,7 +119,7 @@
         const ventMax = (meteo.wind_gusts_10m_max?.[i] === undefined || meteo.wind_gusts_10m_max?.[i] === null) ? "X" : Math.round(meteo.wind_gusts_10m_max[i]);
         
         const pluieProbable = (meteo.precipitation_probability_max?.[i] === undefined || meteo.precipitation_probability_max?.[i] === null) ? "X" : Math.round(meteo.precipitation_probability_max[i]);
-        const PluieAverse = (meteo.precipitation_hours?.[i] === undefined || meteo.precipitation_hours?.[i] === null) ? "X" : meteo.precipitation_hours[i];
+        const PluieTemps = (meteo.precipitation_hours?.[i] === undefined || meteo.precipitation_hours?.[i] === null) ? "X" : meteo.precipitation_hours[i];
         const pluie = (meteo.precipitation_sum?.[i] === undefined || meteo.precipitation_sum?.[i] === null) ? "X" : meteo.precipitation_sum[i].toFixed(1);
         
         const tmin = (meteo.temperature_2m_min?.[i] === undefined || meteo.temperature_2m_min?.[i] === null) ? "X" : meteo.temperature_2m_min[i].toFixed(0);
@@ -154,7 +154,7 @@
             <td ${(vent > 60 || ventMax > 80) ? ' style="color:red;font-weight:bold;"' : (vent > 40 || ventMax > 55) ? ' style="color:orange;font-weight:bold;"' : ''}>${vent}km/h | ${ventMax}km/h</td>
             
             <td ${(pluieProbable > 55) ? ' style="color:blue;font-weight:bold;"' : ''}>${pluieProbable}%</td>
-            <td ${(PluieAverse > 2) ? ' style="color:blue;font-weight:bold;"' : ''}>${PluieAverse}</td>
+            <td>${PluieTemps} h</td>
             <td  ${(pluie > 1) ? ' style="color:blue;font-weight:bold;"' : ''}>${pluie}</td>
 
             <td class="${colorETP(etp)}">${etp}</td>

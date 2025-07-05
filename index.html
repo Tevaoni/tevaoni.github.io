@@ -116,15 +116,16 @@
         const vent = vent = (meteo.wind_speed_10m_max?.[i] === undefined || meteo.wind_speed_10m_max?.[i] === null) ? " X " : Math.round(meteo.wind_speed_10m_max[i]);
         const ventMax = (meteo.wind_gusts_10m_max?.[i] === undefined || meteo.wind_gusts_10m_max?.[i] === null) ? "X" : Math.round(meteo.wind_gusts_10m_max[i]);
         const pluieProbable = (meteo.precipitation_probability_max?.[i] === undefined || meteo.precipitation_probability_max?.[i] === null) ? "X" : Math.round(meteo.precipitation_probability_max[i]);
-        const tmin = (meteo.temperature_2m_min?.[i] === undefined || meteo.temperature_2m_min?.[i] === null) ? "X" : meteo.temperature_2m_min[i].toFixed(1);
-        const tmax = (meteo.temperature_2m_max?.[i] === undefined || meteo.temperature_2m_max?.[i] === null) ? "X" : meteo.temperature_2m_max[i].toFixed(1);
+        const tmin = (meteo.temperature_2m_min?.[i] === undefined || meteo.temperature_2m_min?.[i] === null) ? "X" : meteo.temperature_2m_min[i].toFixed(0);
+        const tmax = (meteo.temperature_2m_max?.[i] === undefined || meteo.temperature_2m_max?.[i] === null) ? "X" : meteo.temperature_2m_max[i].toFixed(0);
         const etp = (meteo.et0_fao_evapotranspiration?.[i] === undefined || meteo.et0_fao_evapotranspiration?.[i] === null) ? "X" : meteo.et0_fao_evapotranspiration[i].toFixed(1);
         const pluie = (meteo.precipitation_sum?.[i] === undefined || meteo.precipitation_sum?.[i] === null) ? "X" : meteo.precipitation_sum[i].toFixed(1);
 
-        const date = meteo.time?.[i] : '';
+        const date = meteo.time?.[i] ?? '';
         const weekend = isWeekend(date) ? 'weekend' : '';
-        const besoin = (etp === "X" || pluie === "X") ? "X" : Math.max(0, etp - pluie).toFixed(1);
-        const seuil = (besoin === "X") ? "X" : (besoin * 0.8 / 1.2);
+        
+        const besoin = (etp === "X" || pluie === "X") ? "X" : Math.max(0, parseFloat(etp) - parseFloat(pluie)).toFixed(1);
+        const seuil = (besoin === "X") ? "X" : (parseFloat(besoin) * 0.8 / 1.2);
         const arrondi = (seuil === "X") ? "X" : Math.ceil(seuil) * 100;
         const arrosage = (besoin === "X" || besoin == 0) ? "🚫" : `${arrondi}%`;
 
@@ -143,12 +144,12 @@
         rows += `
           <tr>
             <td class="${weekend}">${getDayName(date)}${symboleFete}</td>
-            <td><span class="${colorTemp(tmin)}">${tmin.toFixed(1)}°C</span> | <span class="${colorTemp(tmax)}">${tmax.toFixed(1)}°C</span></td>
+            <td><span class="${colorTemp(tmin)}">${tmin}°C</span> | <span class="${colorTemp(tmax)}">${tmax}°C</span></td>
             <td ${(vent > 60 || ventMax > 80) ? ' style="color:red;font-weight:bold;"' : (vent > 40 || ventMax > 55) ? ' style="color:orange;font-weight:bold;"' : ''}>${vent}km/h | ${ventMax}km/h</td>
             <td ${(pluieProbable > 55) ? ' style="color:blue;font-weight:bold;"' : ''}>${pluieProbable}%</td>
-            <td  ${(pluie > 1) ? ' style="color:blue;font-weight:bold;"' : ''}>${pluie.toFixed(1)}</td>
-            <td class="${colorETP(etp)}">${etp.toFixed(1)}</td>
-            <td>${besoin == 0 ? '🚫' : besoin.toFixed(1)}</td>
+            <td  ${(pluie > 1) ? ' style="color:blue;font-weight:bold;"' : ''}>${pluie}</td>
+            <td class="${colorETP(etp)}">${etp}</td>
+            <td>${besoin == 0 ? '🚫' : besoin}</td>
             <td>${arrosage}</td>
           </tr>
         `;

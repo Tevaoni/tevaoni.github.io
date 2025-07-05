@@ -14,9 +14,9 @@
     th, td { border: 1px solid #22aa77; }
     th { background: #66cc99; }
     .weekend { background-color: #804A80 !important; color: #fff; }
-    .blue { color: #0070f3; font-weight: bold; }
-    .red { color: #ff3b3b; font-weight: bold; }
-    .rain { color: #2299ee; font-weight: bold; }
+    .blue { color: blue; font-weight: bold; }
+    .red { color: red; font-weight: bold; }
+    .orange { color: orange; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -27,7 +27,7 @@
         <th>Date</th>
         <th>Temp. Min/Max</th>
         <th>Vent/Rafale</th>
-        <th>Probalité qu'il pleuve</th>
+        <th>Probabilité qu'il pleuve</th>
         <th>Pluie</th>
         <th>ETP</th>
         <th>Besoin d’arrosage</th>
@@ -51,56 +51,120 @@
     function colorTemp(val) {
       if(val < 0) return 'blue';
       if(val > 30) return 'red';
+      if(val > 26) return 'orange';
       return '';
     }
 
     function colorETP(val) {
       return val > 6 ? 'red' : '';
     }
-
-    function colorPluie(val) {
-      return val > 1 ? 'rain' : '';
+    // les jours fériés
+    function getEaster(year) {
+      // Calcul de la date de Pâques (algorithme de Gauss)
+      var f = Math.floor,
+          G = year % 19,
+          C = f(year / 100),
+          H = (C - f(C / 4) - f((8*C + 13) / 25) + 19*G + 15) % 30,
+          I = H - f(H / 28) * (1 - f(H / 28) * f(29 / (H + 1)) * f((21 - G) / 11)),
+          J = (year + f(year / 4) + I + 2 - C + f(C / 4)) % 7,
+          L = I - J,
+          month = 3 + f((L + 40) / 44),
+          day = L + 28 - 31 * f(month / 4);
+      return new Date(year, month - 1, day);
+    }
+    function joursFeriesFrance(year) {
+      // Jours fixes
+      const feries = [
+        new Date(year, 0, 1),    // 1 Janvier
+        new Date(year, 4, 1),    // 1 Mai
+        new Date(year, 4, 8),    // 8 Mai
+        new Date(year, 6, 14),   // 14 Juillet
+        new Date(year, 7, 15),   // 15 Août
+        new Date(year, 10, 1),   // 1 Novembre
+        new Date(year, 10, 11),  // 11 Novembre
+        new Date(year, 11, 25)   // 25 Décembre
+      ];
+      // Jours mobiles
+      const paques = getEaster(year);
+      const lundiPaques = new Date(paques); lundiPaques.setDate(paques.getDate() + 1);
+      const ascension = new Date(paques); ascension.setDate(paques.getDate() + 39);
+      const pentecote = new Date(paques); pentecote.setDate(paques.getDate() + 50);
+      const lundiPentecote = new Date(paques); lundiPentecote.setDate(paques.getDate() + 51);
+      feries.push(
+        lundiPaques,    // Lundi de Pâques
+        ascension,      // Ascension
+        pentecote,      // Pentecôte (dimanche)
+        lundiPentecote  // Lundi de Pentecôte
+      );
+      return feries.map(d => d.toISOString().slice(0,10)); // format 'YYYY-MM-DD'
+    }
+    // Fonction de test
+    function estFerie(date) {
+      const year = date.getFullYear();
+      const feries = joursFeriesFrance(year);
+      const dISO = date.toISOString().slice(0,10); // 'YYYY-MM-DD'
+      return feries.includes(dISO);
     }
 
     function afficherTableau(meteo) {
+      try {
       const tbody = document.getElementById('table-contenu');
       tbody.innerHTML = '';
-      const n = meteo.time.length;
+      const n = meteo.time?.length ?? 0;
+      let rows = '';
       for(let i=0; i<n; ++i) {
-        const vent = Math.round(meteo.wind_speed_10m_max[i]);
-        const ventMax = Math.round(meteo.wind_gusts_10m_max[i]);
-        const pluieProbable = Math.round(meteo.precipitation_probability_max[i]);
-        const date = meteo.time[i];
-        const tmin = meteo.temperature_2m_min[i];
-        const tmax = meteo.temperature_2m_max[i];
-        const etp = meteo.et0_fao_evapotranspiration[i];
-        const pluie = meteo.precipitation_sum[i];
-        const weekend = isWeekend(date) ? 'weekend' : '';
-        const besoin = Math.max(0, etp - pluie);
-        const seuil = besoin * 0.8 / 1.2;
-        const arrondi = Math.ceil(seuil) * 100;
-        const arrosage = besoin == 0 ? '🚫' : `${arrondi}%`;
+        
+        const vent = (meteo.wind_speed_10m_max?.[i] === undefined || meteo.wind_speed_10m_max?.[i] === null) ? " X " : Math.round(meteo.wind_speed_10m_max[i]);
+        const ventMax = (meteo.wind_gusts_10m_max?.[i] === undefined || meteo.wind_gusts_10m_max?.[i] === null) ? "X" : Math.round(meteo.wind_gusts_10m_max[i]);
+        const pluieProbable = (meteo.precipitation_probability_max?.[i] === undefined || meteo.precipitation_probability_max?.[i] === null) ? "X" : Math.round(meteo.precipitation_probability_max[i]);
+        const tmin = (meteo.temperature_2m_min?.[i] === undefined || meteo.temperature_2m_min?.[i] === null) ? "X" : meteo.temperature_2m_min[i].toFixed(0);
+        const tmax = (meteo.temperature_2m_max?.[i] === undefined || meteo.temperature_2m_max?.[i] === null) ? "X" : meteo.temperature_2m_max[i].toFixed(0);
+        const etp = (meteo.et0_fao_evapotranspiration?.[i] === undefined || meteo.et0_fao_evapotranspiration?.[i] === null) ? "X" : meteo.et0_fao_evapotranspiration[i].toFixed(1);
+        const pluie = (meteo.precipitation_sum?.[i] === undefined || meteo.precipitation_sum?.[i] === null) ? "X" : meteo.precipitation_sum[i].toFixed(1);
 
-        tbody.innerHTML += `
+        const date = meteo.time?.[i] ?? '';
+        const weekend = isWeekend(date) ? 'weekend' : '';
+        
+        const besoin = (etp === "X" || pluie === "X") ? "X" : Math.max(0, parseFloat(etp) - parseFloat(pluie)).toFixed(1);
+        const seuil = (besoin === "X") ? "X" : (parseFloat(besoin) * 0.8 / 1.2);
+        const arrondi = (seuil === "X") ? "X" : Math.ceil(seuil) * 100;
+        const arrosage = (besoin === "X" || besoin == 0) ? "🚫" : `${arrondi}%`;
+
+        // symbole jours fériés
+        let symboleFete = "";
+        if (date) {
+          const [year, month, day] = date.split('-');
+          if (year && month && day) {
+            const d = new Date(Number(year), Number(month) - 1, Number(day));
+            if (estFerie(d)) {
+              symboleFete = " 🎉";
+            }
+          }
+        }
+        
+        rows += `
           <tr>
-            <td class="${weekend}">${getDayName(date)}</td>
-            <td>
-              <span class="${colorTemp(tmin)}">${tmin.toFixed(1)}°C</span>/<span class="${colorTemp(tmax)}">${tmax.toFixed(1)}°C</span>
-            </td>
-            <td>${vent}km/h / ${ventMax}km/h</td>
-            <td>${pluieProbable}%</td>
-            <td class="${colorPluie(pluie)}">${pluie.toFixed(1)}</td>
-            <td class="${colorETP(etp)}">${etp.toFixed(1)}</td>
-            <td>${besoin == 0 ? '🚫' : besoin.toFixed(1)}</td>
+            <td class="${weekend}">${getDayName(date)}${symboleFete}</td>
+            <td><span class="${colorTemp(tmin)}">${tmin}°C</span> | <span class="${colorTemp(tmax)}">${tmax}°C</span></td>
+            <td ${(vent > 60 || ventMax > 80) ? ' style="color:red;font-weight:bold;"' : (vent > 40 || ventMax > 55) ? ' style="color:orange;font-weight:bold;"' : ''}>${vent}km/h | ${ventMax}km/h</td>
+            <td ${(pluieProbable > 55) ? ' style="color:blue;font-weight:bold;"' : ''}>${pluieProbable}%</td>
+            <td  ${(pluie > 1) ? ' style="color:blue;font-weight:bold;"' : ''}>${pluie}</td>
+            <td class="${colorETP(etp)}">${etp}</td>
+            <td>${besoin == 0 ? '🚫' : besoin}</td>
             <td>${arrosage}</td>
           </tr>
         `;
+      }
+      tbody.innerHTML = rows;
+      } catch(e) {
+        console.error('Erreur dans afficherTableau:', e);
+        document.getElementById('table-contenu').innerHTML = '<tr><td colspan="6">Erreur JS : ' + e.message + '</td></tr>';
       }
     }
 
     fetch(API_URL)
       .then(r => r.json())
-      .then(data => afficherTableau(data.daily))
+      .then(data => {console.log('Réponse API:', data); afficherTableau(data.daily); })
       .catch(() => {
         document.getElementById('table-contenu').innerHTML = '<tr><td colspan="6">Erreur de chargement des données météo.</td></tr>';
       });

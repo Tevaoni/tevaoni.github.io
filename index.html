@@ -25,10 +25,11 @@
     <thead>
       <tr>
         <th>Date</th>
-        <th>Temp. Min/Max</th>
-        <th>Vent/Rafale</th>
-        <th>Probabilité qu'il pleuve</th>
-        <th>Pluie</th>
+        <th>Temp. Min / Max</th>
+        <th>Vent / Rafale</th>
+        <th>Pluie probable</th>
+        <th>Pluie averse</th>
+        <th>Pluie total</th>
         <th>ETP</th>
         <th>Besoin d’arrosage</th>
         <th>Arrosage > 80% Besoin</th>
@@ -38,7 +39,7 @@
   </table>
 
   <script>
-    const API_URL = "https://api.open-meteo.com/v1/forecast?latitude=49.8942&longitude=2.2633&daily=wind_speed_10m_max,wind_gusts_10m_max,precipitation_probability_max,temperature_2m_max,temperature_2m_min,et0_fao_evapotranspiration,precipitation_sum&timezone=Europe%2FParis&altitude=22&forecast_days=16";
+    const API_URL = "https://api.open-meteo.com/v1/forecast?latitude=49.8942&longitude=2.2633&daily=wind_speed_10m_max,wind_gusts_10m_max,temperature_2m_max,temperature_2m_min,et0_fao_evapotranspiration,precipitation_sum,precipitation_hours,precipitation_probability_max&timezone=Europe%2FParis&altitude=22&forecast_days=16";
     function getDayName(dateStr) {
       return new Date(dateStr).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' });
     }
@@ -116,11 +117,15 @@
         
         const vent = (meteo.wind_speed_10m_max?.[i] === undefined || meteo.wind_speed_10m_max?.[i] === null) ? " X " : Math.round(meteo.wind_speed_10m_max[i]);
         const ventMax = (meteo.wind_gusts_10m_max?.[i] === undefined || meteo.wind_gusts_10m_max?.[i] === null) ? "X" : Math.round(meteo.wind_gusts_10m_max[i]);
+        
         const pluieProbable = (meteo.precipitation_probability_max?.[i] === undefined || meteo.precipitation_probability_max?.[i] === null) ? "X" : Math.round(meteo.precipitation_probability_max[i]);
+        const pluieAverse = (meteo.precipitation_hours?.[i] === undefined || meteo.precipitation_hours?.[i] === null) ? "X" : meteo.precipitation_hours[i];
+        const pluie = (meteo.precipitation_sum?.[i] === undefined || meteo.precipitation_sum?.[i] === null) ? "X" : meteo.precipitation_sum[i].toFixed(1);
+        
         const tmin = (meteo.temperature_2m_min?.[i] === undefined || meteo.temperature_2m_min?.[i] === null) ? "X" : meteo.temperature_2m_min[i].toFixed(0);
         const tmax = (meteo.temperature_2m_max?.[i] === undefined || meteo.temperature_2m_max?.[i] === null) ? "X" : meteo.temperature_2m_max[i].toFixed(0);
+        
         const etp = (meteo.et0_fao_evapotranspiration?.[i] === undefined || meteo.et0_fao_evapotranspiration?.[i] === null) ? "X" : meteo.et0_fao_evapotranspiration[i].toFixed(1);
-        const pluie = (meteo.precipitation_sum?.[i] === undefined || meteo.precipitation_sum?.[i] === null) ? "X" : meteo.precipitation_sum[i].toFixed(1);
 
         const date = meteo.time?.[i] ?? '';
         const weekend = isWeekend(date) ? 'weekend' : '';
@@ -147,8 +152,11 @@
             <td class="${weekend}">${getDayName(date)}${symboleFete}</td>
             <td><span class="${colorTemp(tmin)}">${tmin}°C</span> | <span class="${colorTemp(tmax)}">${tmax}°C</span></td>
             <td ${(vent > 60 || ventMax > 80) ? ' style="color:red;font-weight:bold;"' : (vent > 40 || ventMax > 55) ? ' style="color:orange;font-weight:bold;"' : ''}>${vent}km/h | ${ventMax}km/h</td>
+            
             <td ${(pluieProbable > 55) ? ' style="color:blue;font-weight:bold;"' : ''}>${pluieProbable}%</td>
+            <td ${(PluieAverse > 2) ? ' style="color:blue;font-weight:bold;"' : ''}>${PluieAverse}</td>
             <td  ${(pluie > 1) ? ' style="color:blue;font-weight:bold;"' : ''}>${pluie}</td>
+
             <td class="${colorETP(etp)}">${etp}</td>
             <td>${besoin == 0 ? '🚫' : besoin}</td>
             <td>${arrosage}</td>

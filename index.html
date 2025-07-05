@@ -119,7 +119,7 @@
         const ventMax = (meteo.wind_gusts_10m_max?.[i] === undefined || meteo.wind_gusts_10m_max?.[i] === null) ? "X" : Math.round(meteo.wind_gusts_10m_max[i]);
         
         const pluieProbable = (meteo.precipitation_probability_max?.[i] === undefined || meteo.precipitation_probability_max?.[i] === null) ? "X" : Math.round(meteo.precipitation_probability_max[i]);
-        const pluieAverse = (meteo.precipitation_hours?.[i] === undefined || meteo.precipitation_hours?.[i] === null) ? "X" : meteo.precipitation_hours[i];
+        const PluieAverse = (meteo.precipitation_hours?.[i] === undefined || meteo.precipitation_hours?.[i] === null) ? "X" : meteo.precipitation_hours[i];
         const pluie = (meteo.precipitation_sum?.[i] === undefined || meteo.precipitation_sum?.[i] === null) ? "X" : meteo.precipitation_sum[i].toFixed(1);
         
         const tmin = (meteo.temperature_2m_min?.[i] === undefined || meteo.temperature_2m_min?.[i] === null) ? "X" : meteo.temperature_2m_min[i].toFixed(0);

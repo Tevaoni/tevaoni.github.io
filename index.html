@@ -159,7 +159,7 @@
 
     fetch(API_URL)
       .then(r => r.json())
-      .then(data => afficherTableau(data.daily))
+      .then(data => {console.log('Réponse API:', data); afficherTableau(data.daily); })
       .catch(() => {
         document.getElementById('table-contenu').innerHTML = '<tr><td colspan="6">Erreur de chargement des données météo.</td></tr>';
       });

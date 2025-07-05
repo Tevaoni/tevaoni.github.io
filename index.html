@@ -121,19 +121,23 @@
         const etp = (meteo.et0_fao_evapotranspiration?.[i] === undefined || meteo.et0_fao_evapotranspiration?.[i] === null) ? "X" : meteo.et0_fao_evapotranspiration[i].toFixed(1);
         const pluie = (meteo.precipitation_sum?.[i] === undefined || meteo.precipitation_sum?.[i] === null) ? "X" : meteo.precipitation_sum[i].toFixed(1);
 
-        const date = meteo.time[i] ? '';
+        const date = meteo.time?.[i] : '';
         const weekend = isWeekend(date) ? 'weekend' : '';
         const besoin = (etp === "X" || pluie === "X") ? "X" : Math.max(0, etp - pluie).toFixed(1);
         const seuil = (besoin === "X") ? "X" : (besoin * 0.8 / 1.2);
         const arrondi = (seuil === "X") ? "X" : Math.ceil(seuil) * 100;
         const arrosage = (besoin === "X" || besoin == 0) ? "🚫" : `${arrondi}%`;
 
-        // const d = new Date(date);
-        const [year, month, day] = date.split('-');
-        const d = new Date(Number(year), Number(month) - 1, Number(day));
+        // symbole jours fériés
         let symboleFete = "";
-        if (estFerie(d)) {
-          symboleFete = " 🎉";
+        if (date) {
+          const [year, month, day] = date.split('-');
+          if (year && month && day) {
+            const d = new Date(Number(year), Number(month) - 1, Number(day));
+            if (estFerie(d)) {
+              symboleFete = " 🎉";
+            }
+          }
         }
         
         rows += `

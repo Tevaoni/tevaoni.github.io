@@ -107,6 +107,7 @@
     }
 
     function afficherTableau(meteo) {
+      try {
       const tbody = document.getElementById('table-contenu');
       tbody.innerHTML = '';
       const n = meteo.time?.length ?? 0;
@@ -155,6 +156,10 @@
         `;
       }
       tbody.innerHTML = rows;
+      } catch(e) {
+        console.error('Erreur dans afficherTableau:', e);
+        document.getElementById('table-contenu').innerHTML = '<tr><td colspan="6">Erreur JS : ' + e.message + '</td></tr>';
+      }
     }
 
     fetch(API_URL)

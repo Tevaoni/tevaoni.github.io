@@ -107,6 +107,21 @@
       return feries.includes(dISO);
     }
 
+    // Liste des anniversaires
+    const anniversaires = [
+      { jour: 28, mois: 6, nom: "Yan" },     // 28 juillet
+      { jour: 31, mois: 6, nom: "Biniam" }   // 31 juillet
+      { jour: 4, mois: 7, nom: "FMAO" }   // test
+    ];
+
+    // Fonction pour tester si c'est l'anniversaire de quelqu'un
+    function getAnniversaire(date) {
+      const jour = date.getDate();
+      const mois = date.getMonth();
+      const trouve = anniversaires.find(a => a.jour === jour && a.mois === mois);
+      return trouve ? ` 🎂${trouve.nom}` : "";
+    }
+
     function afficherTableau(meteo) {
       try {
       const tbody = document.getElementById('table-contenu');
@@ -144,6 +159,7 @@
             if (estFerie(d)) {
               symboleFete = " 🎉";
             }
+            symboleFete += getAnniversaire(d); // Ajoute l'anniversaire avec nom si c'est le cas
           }
         }
         
